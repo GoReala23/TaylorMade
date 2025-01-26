@@ -37,8 +37,6 @@ const Home = () => {
   });
   const previewRef = useRef(null);
 
-  console.log('Passing product to Card:', products);
-
   const openPreview = (product) => {
     setModalState({
       type: 'preview',
@@ -48,13 +46,7 @@ const Home = () => {
   };
 
   const openBuyModal = (product, quantity = 1) => {
-    console.log('openBuyModal called with:', product, quantity);
     setModalState({
-      type: 'buy',
-      product: formatProductData(product),
-      quantity,
-    });
-    console.log('Updated modalState:', {
       type: 'buy',
       product: formatProductData(product),
       quantity,
@@ -62,7 +54,6 @@ const Home = () => {
   };
 
   const closeModal = () => {
-    console.log('closeModal called');
     setModalState({
       type: null,
       product: null,
@@ -71,16 +62,8 @@ const Home = () => {
   };
 
   const handleBuyNow = async (product) => {
-    console.log('handleBuyNow called with product:', product);
-
     // Directly set the modalState to open the BuyModal
     setModalState({
-      type: 'buy',
-      product: formatProductData(product),
-      quantity: 1,
-    });
-
-    console.log('BuyModal state updated:', {
       type: 'buy',
       product: formatProductData(product),
       quantity: 1,
@@ -106,7 +89,7 @@ const Home = () => {
       try {
         setIsLoading(true);
         const fetchedProducts = await Api.getItems();
-        console.log('Fetched Products:', fetchedProducts);
+
         const validProducts = fetchedProducts.filter(
           (product) =>
             product &&

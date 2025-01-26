@@ -31,7 +31,6 @@ export const login = async (email, password) => {
 export const getCurrentUser = async (token) => {
   try {
     const response = await Api.getCurrentUser(token);
-    console.log('Got current user:', response);
 
     if (response && response.user) {
       return response.user;

@@ -26,7 +26,7 @@ const App = () => {
       <Routes>
         <Route
           path='/'
-          element={isLoggedIn ? <Dashboard /> : <LandingPage />}
+          element={!isLoggedIn ? <LandingPage /> : <Navigate to='/home' />}
         />
         <Route
           path='/dashboard'

@@ -31,13 +31,18 @@
   font-size: 3rem;
   text-align: center;
   margin-bottom: 30px;
+  border: #8b4513 solid 1px;
   color: #8b4513;
   font-weight: bold;
 }
 
-.orders__filters {
+.orders__filter {
+  padding: 5px;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  border: #8b4513 solid 1px;
   margin-bottom: 20px;
 }
 
@@ -53,7 +58,7 @@
 
 .orders__list {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(3, 1fr);
   gap: 20px;
 }
 

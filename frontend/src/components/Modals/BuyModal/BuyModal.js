@@ -13,16 +13,7 @@ const BuyModal = ({
 }) => {
   const { values, handleChange, errors, isValid } = useFormAndValidation();
 
-  useEffect(() => {
-    console.log(
-      'BuyModal isOpen:',
-      isOpen,
-      'product:',
-      product,
-      'quantity:',
-      quantity,
-    );
-  }, [isOpen, product, quantity]);
+  useEffect(() => {}, [isOpen, product, quantity]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -31,14 +22,7 @@ const BuyModal = ({
     try {
       const token = localStorage.getItem('token');
       await Api.createOrder(product._id, quantity, values.address, token);
-      console.log(
-        'Order placed successfully!',
-        product,
-        product._id,
-        // product._id.image,
-        quantity,
-        values,
-      );
+
       onClose();
       alert('Order placed successfully!');
     } catch (error) {

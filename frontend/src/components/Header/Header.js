@@ -11,9 +11,7 @@ const Header = () => {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { login } = useContext(AuthContext);
 
-  const isLandingPage =
-    useLocation().pathname === '/' || useLocation().pathname === '/#';
-  console.log(isLandingPage);
+  const isLandingPage = useLocation().pathname === '/';
 
   const handleLoginClick = (e) => {
     e.preventDefault();
