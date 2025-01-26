@@ -102,7 +102,7 @@ const Home = () => {
         console.error('Error fetching products:', error);
         setError(error.message);
       } finally {
-        // setIsLoading(false);
+        setIsLoading(false);
       }
     };
     fetchProducts();
