@@ -21,7 +21,7 @@
 .modal__content {
   position: relative;
   background-color: rgba(246, 224, 158, 0.95);
-  padding: auto;
+  padding: 0 10x;
   border-radius: 8px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   width: 100%;
@@ -76,10 +76,10 @@
 }
 
 .modal__form-input {
-  padding: 10px;
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
+  max-width: 100%;
   width: 100%;
 }
 
