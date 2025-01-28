@@ -1,4 +1,5 @@
-const BASE_URL = 'http://localhost:5000';
+// const BASE_URL = 'http://localhost:5000';
+const BASE_URL = 'http://localhost:5000' || 'https://fakestoreapi.com/products';
 
 const checkIfAdmin = async (token) => {
   try {

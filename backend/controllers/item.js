@@ -277,12 +277,10 @@ const toggleFeatured = async (req, res) => {
 // Bulk create items for emergency product additions
 const getFeaturedProducts = async (req, res) => {
   try {
-    const featuredProducts = await Item.find({ isFeatured: true });
-    res.json(featuredProducts);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Error fetching featured products', error });
+    const items = getItems().find({ isFeatured: true });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ message: 'Server error', error: err.message });
   }
 };
 
