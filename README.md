@@ -29,7 +29,7 @@ A full-stack e-commerce application for food products with user authentication, 
 
 ## Live Demo
 
-[View Live Demo](https://goreala23.github.io/Taylor-Made_FullStack)
+[View Live Demo](https://goreala23.github.io/TaylorMade)
 
 ## API Documentation
 
