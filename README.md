@@ -1,4 +1,4 @@
-# TaylorMade FullStack
+# TaylorMade
 
 A full-stack e-commerce application for food products with user authentication, shopping cart functionality, and order management.
 
