@@ -1,4 +1,4 @@
-# Taylor-Made FullStack
+# TaylorMade FullStack
 
 A full-stack e-commerce application for food products with user authentication, shopping cart functionality, and order management.
 
@@ -46,7 +46,7 @@ Base URL: `http://localhost:5000/api`
 ## Installation
 
 1. Clone repository:
-   git clone https://github.com/GoReala23/Taylor-Made_FullStack.git
+   git clone https://github.com/GoReala23/TaylorMade.git
 
 2. Install dependencies:
    Backend
