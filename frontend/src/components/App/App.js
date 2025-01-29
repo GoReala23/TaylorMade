@@ -10,7 +10,7 @@ import Profile from '../Profile/Profile';
 import Orders from '../Orders/Orders';
 import Settings from '../Settings/Settings';
 import About from '../About/About';
-import Locations from '../Locations/Locations';
+// import Locations from '../Locations/Locations';
 import LandingPage from '../LandingPage/LandingPage';
 import CartModal from '../Modals/CartModal/CartModal';
 import Footer from '../Footer/Footer';
@@ -60,7 +60,7 @@ const App = () => {
           element={isLoggedIn ? <CartModal /> : <Navigate to='/' />}
         />
         <Route path='/about' element={<About />} />
-        <Route path='/locations' element={<Locations />} />
+        {/* <Route path='/locations' element={<Locations />} /> */}
       </Routes>
       <Footer />
     </div>

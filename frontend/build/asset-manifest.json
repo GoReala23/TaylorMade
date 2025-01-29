@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/TaylorMade/static/css/main.1266c2d6.css",
-    "main.js": "/TaylorMade/static/js/main.29146bbf.js",
+    "main.js": "/TaylorMade/static/js/main.ddc5e2d2.js",
     "static/js/453.8ab44547.chunk.js": "/TaylorMade/static/js/453.8ab44547.chunk.js",
     "static/media/Taylor-Made_Title.webp": "/TaylorMade/static/media/Taylor-Made_Title.26ef1c5ad02203c5d035.webp",
     "static/media/home__page-bkgrd.webp": "/TaylorMade/static/media/home__page-bkgrd.80e5f826ffa6efd34c3a.webp",
@@ -11,11 +11,11 @@
     "static/media/plate_right-log.jpg": "/TaylorMade/static/media/plate_right-log.62845c006ee2a1fdf0c0.jpg",
     "index.html": "/TaylorMade/index.html",
     "main.1266c2d6.css.map": "/TaylorMade/static/css/main.1266c2d6.css.map",
-    "main.29146bbf.js.map": "/TaylorMade/static/js/main.29146bbf.js.map",
+    "main.ddc5e2d2.js.map": "/TaylorMade/static/js/main.ddc5e2d2.js.map",
     "453.8ab44547.chunk.js.map": "/TaylorMade/static/js/453.8ab44547.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.1266c2d6.css",
-    "static/js/main.29146bbf.js"
+    "static/js/main.ddc5e2d2.js"
   ]
 }

@@ -5,7 +5,6 @@ import { AuthContext } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import BuyModal from '../Modals/BuyModal/BuyModal';
-import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Card, { formatProductData } from '../Card/Card';
 import Api from '../../utils/Api';
@@ -13,7 +12,6 @@ import './Home.css';
 
 const Home = () => {
   const navigate = useNavigate();
-  const { featuredProducts } = useFeaturedProducts();
   const {
     cartItems,
     addToCart,
@@ -30,12 +28,37 @@ const Home = () => {
   const [orders, setOrders] = useState([]);
   const { favorites, addFavorite, removeFavorite, isLoggedIn } = useFavorites();
   const [forceRender, setForceRender] = useState(false);
+  const [featuredProducts, setFeaturedProducts] = useState([]);
   const [modalState, setModalState] = useState({
     type: null,
     product: null,
     quantity: 1,
   });
   const previewRef = useRef(null);
+
+  useEffect(() => {
+    const fetchFeaturedProducts = async () => {
+      try {
+        const fetchedProducts = await Api.getFeaturedProducts();
+        setFeaturedProducts(fetchedProducts);
+        const validProducts = fetchedProducts.filter(
+          (product) =>
+            product &&
+            product.name &&
+            product.price !== undefined &&
+            product.imageUrl,
+        );
+        setFeaturedProducts(validProducts);
+      } catch (err) {
+        console.error('Error fetching featured products:', error);
+        setError(error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchFeaturedProducts();
+  }, []);
 
   const openPreview = (product) => {
     setModalState({
@@ -163,7 +186,6 @@ const Home = () => {
       addFavorite(product);
     }
   };
-
   const renderOrdersSection = () => {
     if (orders.length === 0) {
       return <p>You have no orders.</p>;
@@ -173,7 +195,7 @@ const Home = () => {
       <section className='home__section'>
         <div className='home__section-title'>My Orders</div>
         <div className='home__grid'>
-          {orders.map((order) => {
+          {orders.slice(0, 4).map((order) => {
             const product = order.item[0];
             return (
               <Card

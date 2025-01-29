@@ -1,5 +1,10 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
+# Specific to this project
+frontend\src\components\Locations\Location.js
+frontend\src\components\Locations\Location.css
+frontend\src\components\Locations\Location.test.js
+
 # compiled output
 /dist
 /tmp
