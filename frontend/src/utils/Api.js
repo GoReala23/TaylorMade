@@ -431,11 +431,15 @@ const Api = {
     return response.json();
   },
 
-  getFeaturedProducts: async () => {
-    const response = await fetch(`${BASE_URL}/api/item/featured`);
-    return handleResponse(response);
+  getFeaturedProducts: async (items) => {
+    try {
+      const featuredItems = items.filter((item) => item.isFeatured);
+      return featuredItems;
+    } catch (error) {
+      console.error('Failed to get featured products:', error);
+      throw error;
+    }
   },
-
   toggleFeaturedProduct: async (productId) => {
     const response = await fetch(
       `${BASE_URL}/api/items/${productId}/featured`,
