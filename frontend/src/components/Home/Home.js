@@ -40,7 +40,9 @@ const Home = () => {
     const fetchFeaturedProducts = async () => {
       try {
         const fetchedProducts = await Api.getFeaturedProducts();
+
         setFeaturedProducts(fetchedProducts);
+        console.log('fetchedProducts:', fetchedProducts);
         const validProducts = fetchedProducts.filter(
           (product) =>
             product &&
@@ -49,9 +51,9 @@ const Home = () => {
             product.imageUrl,
         );
         setFeaturedProducts(validProducts);
+        console.log('fetchedProducts:', fetchedProducts);
       } catch (err) {
-        console.error('Error fetching featured products:', error);
-        setError(error.message);
+        setError('Error fetching featured products');
       } finally {
         setIsLoading(false);
       }
