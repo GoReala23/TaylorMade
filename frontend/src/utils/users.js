@@ -1,19 +1,19 @@
 const users = [
   {
     name: 'Admin',
-    email: 'adminTest@example.com',
+    email: 'adminTest@example.net',
     password: 'Adminpw123',
     isAdmin: true,
   },
   {
     name: 'User',
-    email: 'regUserTest@example.com',
+    email: 'testEmail',
     password: 'Password123',
     isAdmin: false,
   },
   {
     name: 'User 2',
-    email: 'regUser2Test@example.com',
+    email: 'regUser2@example.com',
     password: 'Password123',
     isAdmin: false,
   },

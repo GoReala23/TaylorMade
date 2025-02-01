@@ -19,7 +19,7 @@ console.log('MONGO_USER:', process.env.MONGO_USER);
 // Middleware
 app.use(
   cors({
-    origin: 'http://localhost:3000',
+    origin: ['https://goreala23.github.io', 'http://localhost:3000'],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
