@@ -22,9 +22,12 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initializeAuthState = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
+      const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (token && localLoggedIn) {
         try {
-          const user = await Auth.getCurrentUser(token);
+          const user =
+            (await Auth.getCurrentUser(token)) ||
+            JSON.parse(localStorage.getItem('user'));
           setCurrentUser(user);
           setIsLoggedIn(true);
         } catch (error) {
@@ -57,6 +60,8 @@ export const AuthProvider = ({ children }) => {
     try {
       const response = await Auth.login(userData.email, userData.password);
       localStorage.setItem('token', response.token);
+      localStorage.setItem('isLoggedIn', true);
+      localStorage.setItem('user', JSON.stringify(response.user));
       setCurrentUser(response);
       setIsLoggedIn(true);
       navigate('/dashboard');
@@ -68,6 +73,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('user');
     setIsLoggedIn(false);
     setCurrentUser(null);
     navigate('/');

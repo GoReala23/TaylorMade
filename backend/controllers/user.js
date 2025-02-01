@@ -236,14 +236,20 @@ const getCurrentUser = async (req, res, next) => {
   }
 };
 const getAllUsers = async (req, res, next) => {
+  let User = req.user.token;
+  console.log(User);
+
+  if (!req.user || !req.user.isAdmin) {
+    return next(new UnauthorizedError('Admin access required'));
+  }
+
   try {
     const users = await User.find({}).select('-password');
-    return res.status(200).send(users);
-  } catch (err) {
-    return next(err);
+    res.json(users);
+  } catch (error) {
+    console.error('Error fetching users:', error);
   }
 };
-
 // Controller function to update user data
 const updateUser = async (req, res, next) => {
   const { name, email } = req.body;

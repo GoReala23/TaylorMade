@@ -1,26 +1,8 @@
-// const BASE_URL = 'http://localhost:5000';
-const BASE_URL = 'http://localhost:5000' || 'https://fakestoreapi.com/products';
+const users = require('./users');
 
-const checkIfAdmin = async (token) => {
-  try {
-    const response = await fetch(`${BASE_URL}/api/user/check-admin`, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
+const BASE_URL = 'http://localhost:5000';
+const THIRD_PARTY_API_URL = 'https://fakestoreapi.com/products';
 
-    if (!response.ok) {
-      return false;
-    }
-
-    const data = await response.json();
-    return data.isAdmin;
-  } catch (error) {
-    console.error('Error checking admin status:', error);
-    return false;
-  }
-};
 const handleResponse = async (response) => {
   if (!response.ok) {
     const errorData = await response.json();
@@ -29,6 +11,10 @@ const handleResponse = async (response) => {
   return response.json();
 };
 
+const getToken = () => {
+  const token = localStorage.getItem('token');
+  return token ? `Bearer ${token}` : null;
+};
 const Api = {
   register: async (name, email, password) => {
     try {
@@ -37,327 +23,112 @@ const Api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
-      return handleResponse(response);
+
+      return await handleResponse(response);
     } catch (error) {
-      console.error('Registration failed:', error);
-      throw error;
+      console.warn(
+        'Backend unavailable. Using local storage for registration.',
+      );
+
+      const storedUsers = JSON.parse(localStorage.getItem('users')) || [
+        ...users,
+      ];
+
+      if (storedUsers.some((user) => user.email === email)) {
+        throw new Error('Email is already registered');
+      }
+
+      const newUser = { name, email, password, isAdmin: false };
+      storedUsers.push(newUser);
+      localStorage.setItem('users', JSON.stringify(storedUsers));
+      localStorage.setItem('user', JSON.stringify(newUser));
+
+      return { token: `fake-jwt-${Date.now()}`, user: newUser };
     }
   },
 
   login: async (email, password) => {
     try {
-      if (!email || !password) {
-        throw new Error('Both email and password are required');
-      }
-
       const response = await fetch(`${BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
-      return handleResponse(response);
+
+      return await handleResponse(response);
     } catch (error) {
-      console.error('Login failed:', error);
-      throw error;
-    }
-  },
+      console.warn('Backend unavailable. Using local storage for login.');
 
-  getCurrentUser: async (token) => {
-    if (!token) {
-      throw new Error('No authentication token provided');
-    }
-
-    try {
-      const response = await fetch(`${BASE_URL}/api/user/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Failed to get current user:', error);
-      throw error;
-    }
-  },
-
-  updateUser: async (token, userData) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/user/me`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Failed to update user:', error);
-      throw error;
-    }
-  },
-  getItems: async (token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/item`, {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error('Failed to get items:', error);
-      throw error;
-    }
-  },
-  addToCart: async (data, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/cart/add`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(data),
-      });
-      alert('Item added to cart');
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Error in addToCart:', error);
-      throw error;
-    }
-  },
-
-  moveToCart: async (productId, token) => {
-    try {
-      const response = await fetch(
-        `${BASE_URL}/api/cart/move-to-cart/${productId}`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
-        },
+      const storedUsers = JSON.parse(localStorage.getItem('users')) || [
+        ...users,
+      ];
+      const user = storedUsers.find(
+        (u) => u.email === email && u.password === password,
       );
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Error moving item to cart:', error);
-      throw error;
+
+      if (!user) throw new Error('Invalid email or password');
+
+      const token = `fake-jwt-${Date.now()}`;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+
+      return { token, user };
     }
   },
 
-  removeSaved: async (productId, token) => {
+  getCurrentUser: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/cart/saved/${productId}`, {
-        method: 'DELETE',
+      const token = getToken();
+      if (!token) throw new Error('No authentication token provided');
+
+      const response = await fetch(`${BASE_URL}/api/user/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
       });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to remove saved item');
+
+      return await handleResponse(response);
+    } catch (error) {
+      console.warn('Backend unavailable. Using local storage for user.');
+
+      const user = JSON.parse(localStorage.getItem('user'));
+      if (!user) throw new Error('User not found');
+
+      return user;
+    }
+  },
+
+  logout: () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+  },
+
+  getItems: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/item`, { method: 'GET' });
+      return await handleResponse(response);
+    } catch (error) {
+      console.warn('Backend unavailable. Fetching from third-party API.');
+
+      try {
+        const response = await fetch(THIRD_PARTY_API_URL);
+        if (!response.ok) throw new Error('Third-party API error');
+
+        const data = await response.json();
+        return data.map((product) => ({
+          _id: product.id,
+          name: product.title,
+          price: product.price,
+          description: product.description,
+          imageUrl: product.image,
+          categories: ['Others'],
+          isFeatured: false,
+        }));
+      } catch (thirdPartyError) {
+        console.error('Failed to fetch third-party products:', thirdPartyError);
+        return [];
       }
-      return response.json();
-    } catch (error) {
-      console.error('Error removing saved item:', error);
-      throw error;
-    }
-  },
-
-  removeFromCart: async (productId, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/cart/remove/${productId}`, {
-        method: 'DELETE',
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Failed to remove from cart:', error);
-      throw error;
-    }
-  },
-
-  // Like an item
-  likeItem: async (itemId, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/item/${itemId}/like`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Error liking item:', error);
-      throw error;
-    }
-  },
-
-  // Get User Orders
-  getUserOrders: async (token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/orders`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      return handleResponse(response);
-    } catch (error) {
-      console.error('Failed to get user orders:', error);
-      throw error;
-    }
-  },
-
-  getAllOrders: async (token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/orders/all`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-
-      if (!response.ok) {
-        if (response.status === 403) {
-          // Check if the user is an admin
-          const isAdmin = await checkIfAdmin(token);
-          if (isAdmin) {
-            // If the user is an admin, retry the request
-            const adminResponse = await fetch(`${BASE_URL}/api/orders/all`, {
-              headers: {
-                Authorization: `Bearer ${token}`,
-                'Content-Type': 'application/json',
-              },
-            });
-
-            if (!adminResponse.ok) {
-              throw new Error('Failed to get all orders as admin');
-            }
-
-            return adminResponse.json();
-          }
-        }
-        throw new Error('Network response was not ok');
-      }
-
-      return response.json();
-    } catch (error) {
-      console.error('Failed to get all orders:', error);
-      throw error;
-    }
-  },
-
-  removeOrder: async (orderId, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/orders/${orderId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to remove order');
-      }
-      return response.json();
-    } catch (error) {
-      console.error('Error removing order:', error);
-      throw error;
-    }
-  },
-
-  cancelOrder: async (orderId, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/orders/cancel/${orderId}`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to cancel order');
-      }
-      return response.json();
-    } catch (error) {
-      console.error('Error cancelling order:', error);
-      throw error;
-    }
-  },
-  updateCartQuantity: async (productId, newQuantity, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/cart/update`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ productId, newQuantity }),
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to update cart quantity');
-      }
-
-      return await response.json();
-    } catch (error) {
-      console.error('Error updating cart quantity:', error);
-      throw error;
-    }
-  },
-
-  updateSavedItemQuantity: async (savedItemId, newQuantity, token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/cart/saved/update`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({ savedItemId, newQuantity }),
-      });
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(
-          errorData.message || 'Failed to update saved item quantity',
-        );
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error updating saved item quantity:', error);
-      throw error;
-    }
-  },
-
-  getSavedItems: async (token) => {
-    try {
-      const response = await fetch(`${BASE_URL}/api/cart/saved`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      });
-      if (!response.ok) {
-        throw new Error('Failed to fetch saved items');
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error fetching saved items:', error);
-      throw error;
     }
   },
 
@@ -366,12 +137,12 @@ const Api = {
       const response = await fetch(`${BASE_URL}/api/cart`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const data = await handleResponse(response);
-
-      return data;
+      return await handleResponse(response);
     } catch (error) {
-      console.error('Failed to get cart:', error);
-      throw error;
+      console.warn('Backend unavailable. Using local storage for cart.');
+
+      const cart = JSON.parse(localStorage.getItem('cart')) || [];
+      return cart;
     }
   },
 
@@ -390,8 +161,37 @@ const Api = {
       );
       return handleResponse(response);
     } catch (error) {
-      console.error('Error moving item to save for later:', error);
-      throw error;
+      console.warn('Backend unavailable. Saving item locally.');
+
+      const savedItems = JSON.parse(localStorage.getItem('savedItems')) || [];
+      const existingItem = savedItems.find(
+        (item) => item.productId === productId,
+      );
+
+      if (existingItem) {
+        existingItem.quantity += quantity; // Prevent duplicates
+      } else {
+        savedItems.push({ productId, quantity });
+      }
+
+      localStorage.setItem('savedItems', JSON.stringify(savedItems));
+      return { productId, quantity };
+    }
+  },
+  getSavedItems: async () => {
+    try {
+      const response = await fetch(`${BASE_URL}/api/cart/saved`, {
+        headers: {
+          Authorization: `Bearer ${getToken()}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      return await handleResponse(response);
+    } catch (error) {
+      console.warn('Backend unavailable. Using local storage for saved items.');
+
+      const savedItems = localStorage.getItem('savedItems');
+      return savedItems ? JSON.parse(savedItems) : [];
     }
   },
 
@@ -403,61 +203,47 @@ const Api = {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify({
-          productId,
-          quantity,
-          address,
-        }),
+        body: JSON.stringify({ productId, quantity, address }),
       });
       return handleResponse(response);
     } catch (error) {
-      console.error('Failed to create order:', error);
-      throw error;
+      console.warn('Backend unavailable. Saving order locally.');
+
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      const newOrder = {
+        id: Date.now(),
+        productId,
+        quantity,
+        address,
+        status: 'Pending',
+      };
+      orders.push(newOrder);
+      localStorage.setItem('orders', JSON.stringify(orders));
+
+      return newOrder;
     }
-  },
-  updateOrderStatus: async (orderId, status, token) => {
-    const response = await fetch(`${BASE_URL}/api/orders/${orderId}/status`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ status }),
-    });
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Failed to update order status');
-    }
-    return response.json();
   },
 
-  getFeaturedProducts: async (items) => {
+  getUserOrders: async (token) => {
     try {
-      const featuredItems = items.filter((item) => item.isFeatured);
-      return featuredItems;
-    } catch (error) {
-      console.error('Failed to get featured products:', error);
-      throw error;
-    }
-  },
-  toggleFeaturedProduct: async (productId) => {
-    const response = await fetch(
-      `${BASE_URL}/api/items/${productId}/featured`,
-      {
-        method: 'PATCH',
+      const response = await fetch(`${BASE_URL}/api/orders`, {
         headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      },
-    );
-    return handleResponse(response);
+      });
+      return handleResponse(response);
+    } catch (error) {
+      console.warn('Backend unavailable. Using local storage for user orders.');
+
+      return JSON.parse(localStorage.getItem('orders')) || [];
+    }
   },
 
-  setupTwoFactor: async (token) => {
+  removeOrder: async (orderId, token) => {
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/setup-2fa`, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}/api/orders/${orderId}`, {
+        method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
@@ -465,25 +251,33 @@ const Api = {
       });
       return handleResponse(response);
     } catch (error) {
-      console.error('Failed to set up 2FA:', error);
-      throw error;
+      console.warn('Backend unavailable. Removing order locally.');
+
+      const orders = JSON.parse(localStorage.getItem('orders')) || [];
+      const orderIndex = orders.findIndex((order) => order.id === orderId);
+
+      if (orderIndex !== -1) {
+        orders.splice(orderIndex, 1);
+        localStorage.setItem('orders', JSON.stringify(orders));
+        return { success: true };
+      }
+      return { success: false };
     }
   },
 
-  verifyTwoFactor: async (token, twoFactorToken) => {
+  getFeaturedProducts: async () => {
     try {
-      const response = await fetch(`${BASE_URL}/api/auth/verify-2fa`, {
-        method: 'POST',
+      const response = await fetch(`${BASE_URL}/api/item/fetaured`, {
+        method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Content-type': 'application/json',
         },
-        body: JSON.stringify({ token: twoFactorToken }),
       });
-      return handleResponse(response);
+      return await handleResponse(response);
     } catch (error) {
-      console.error('Failed to verify 2FA:', error);
-      throw error;
+      console.warn('Backend unavailable. Fetching from third-party API.');
+      const items = await Api.getItems();
+      return items.filter((item) => item.isFeatured);
     }
   },
 };
