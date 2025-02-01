@@ -8,13 +8,13 @@ const users = [
   {
     name: 'User',
     email: 'regUserTest@example.com',
-    password: 'password123',
+    password: 'Password123',
     isAdmin: false,
   },
   {
     name: 'User 2',
     email: 'regUser2Test@example.com',
-    password: 'password123',
+    password: 'Password123',
     isAdmin: false,
   },
 ];
