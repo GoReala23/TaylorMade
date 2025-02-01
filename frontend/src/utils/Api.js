@@ -30,9 +30,7 @@ const Api = {
         'Backend unavailable. Using local storage for registration.',
       );
 
-      const storedUsers = JSON.parse(localStorage.getItem('users')) || [
-        ...users,
-      ];
+      const storedUsers = JSON.parse(localStorage.getItem('users')) || [];
 
       if (storedUsers.some((user) => user.email === email)) {
         throw new Error('Email is already registered');
