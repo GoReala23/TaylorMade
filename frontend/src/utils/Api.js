@@ -1,6 +1,6 @@
 const users = require('./users');
 
-const BASE_URL = 'http://localhost:5000';
+const BASE_URL = process.env.REACT_APP_BASE_URL || 'http://localhost:5000';
 const THIRD_PARTY_API_URL = 'https://fakestoreapi.com/products';
 
 const handleResponse = async (response) => {
