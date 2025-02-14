@@ -1,18 +1,23 @@
 .header {
   position: fixed;
   background: rgba(175, 99, 44, 0.5);
-  z-index: 10;
   display: flex;
-  height: 80px;
-  width: 100%;
+  height: 10vh;
+  min-width: 100vw;
+  top: 0;
   left: 0;
   right: 0;
   justify-content: space-between;
   align-items: center;
-  padding: 10px 20px;
-  font-size: 18px;
+  padding: 1vh 2vw;
+  font-size: 1rem;
   font-family: 'Roboto', sans-serif;
   margin: 0 auto;
+}
+
+.header--no-dashboard {
+  top: 20vh !important;
+  margin-bottom: 2% !important;
 }
 
 .header__nav {
@@ -20,14 +25,15 @@
   justify-content: space-around;
   align-items: center;
   width: 100%;
+  transition: all 0.3s ease-in-out;
 }
 
 .header__nav-link,
 .header__logout-btn {
-  margin: 0 10px;
-  padding: 8px 15px;
-  border: 1px solid #8b4513;
-  border-radius: 5px;
+  margin: 0 1vw;
+  padding: 0.5rem 1rem;
+  border: 0.1rem solid #8b4513;
+  border-radius: 0.5rem;
   background-color: rgba(246, 224, 158, 0.8);
   color: #8b4513;
   text-decoration: none;
@@ -40,37 +46,278 @@
 }
 
 .header__logo {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
   color: #8b4513;
   text-decoration: none;
+  display: flex;
+  align-items: center;
 }
 
 .header__logo-image {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
+  width: 3rem;
+  height: 3rem;
+  margin-right: 1rem;
   border-radius: 55%;
+  /* padding-left: 10px; */
 }
 
-/* LandingPage styles */
-.header__landing {
-  height: 250px;
+/* Landing Page Styles */
+.header--landing {
+  position: absolute;
+  width: 100%;
+  max-width: 1600px;
+  margin: 0 auto;
+  z-index: 10;
+  height: 9vh;
   background: rgba(175, 99, 44, 0.5);
+  transform: translateX(-50%);
+  left: 50%;
+  display: flex;
+  justify-content: centers;
+  align-items: center;
+  /* padding: 0 1px; */
+  /* background-color: yellow; */
 }
 
-.header__landing .header__nav-link,
-.header__landing .header__logout-btn {
-  font-size: 2rem;
+.header--landing .header__nav {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  /* max-width: 1200px; */
+  margin: 0 auto;
+}
+
+.header--landing .header__nav-link,
+.header--landing .header__logout-btn {
+  font-size: 4.2rem;
   font-weight: bold;
-  height: 4rem;
-  width: 10rem;
+  width: 50%;
+  height: 10%;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.header__landing .header__logo-image {
-  width: 120px;
-  /* height: 120px; */
+.header__nav-link {
+  top: 5vh;
+}
+
+.header--landing .header__logo-image {
+  width: 10rem;
+  height: 10rem;
+}
+
+.header__menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: #8b4513;
+  font-size: 2rem;
+  cursor: pointer;
+  position: absolute;
+  padding: 0;
+  right: 15px;
+  top: 2hv;
+  z-index: 100;
+}
+
+/* Tablet View (681px - 1024px) */
+@media screen and (min-width: 1025px) {
+  .header {
+    top: 5.5vh;
+    height: 10vh;
+    padding: 1.5vh 5vw;
+  }
+
+  .header--no-dashboard {
+    /* top: 0 !important; */
+    background-color: blue;
+  }
+
+  .header__nav-link {
+    font-size: 1.2rem;
+  }
+
+  .header__logo-image {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .header--landing .header {
+    width: 90%;
+  }
+
+  .header--landing {
+    height: 9vh;
+    width: 94%;
+    max-width: 100vw;
+    top: 5px;
+    padding: 0.5rem 0.1rem;
+  }
+
+  .header--landing .header__logo-image {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .header--landing .header__nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    width: 100%;
+  }
+
+  .header--landing .header__nav-link {
+    font-size: 1rem;
+    width: 10%;
+  }
+}
+
+/* /Tablet/Laptop View ( 689 - 1024px) */
+
+@media screen and (min-width: 681px) and (max-width: 1024px) {
+  .header {
+    top: 9vh;
+    height: 12vh;
+    padding: 1vh 3vw;
+    width: 100vw;
+    min-width: 100%;
+  }
+
+  .header---dashboard {
+    top: 10% !important;
+    background-color: blue;
+  }
+
+  .header__logo-image {
+    width: 4rem;
+    height: 4rem;
+  }
+
+  .header__landing {
+    height: 6vh;
+    width: 94%;
+    max-width: 100vw;
+    top: 15px;
+    padding: 0.5rem 0.1rem;
+  }
+
+  .header--landing .header__nav {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+
+    width: 100%;
+  }
+
+  .header--landing .header__nav-link {
+    font-size: 0.6rem;
+    width: 5.5rem;
+  }
+
+  .header--landing .header__logo-image {
+    width: 0.1%;
+    height: 3rem;
+  }
+}
+
+/* Mobile View (max-width: 680px) */
+@media screen and (max-width: 680px) {
+  .header {
+    top: 10%;
+    height: 9vh;
+    padding: 1vh 3vw;
+    width: 90%;
+    margin-left: 0;
+  }
+
+  .header--no-dashboard {
+    top: 0 !important;
+    background-color: blue;
+  }
+
+  .header__logo-image {
+    width: 3rem;
+    height: 3rem;
+  }
+
+  /* Mobile Menu Button */
+  .header__menu-toggle {
+    display: block;
+  }
+
+  /* Mobile Nav */
+  .header__nav {
+    display: none;
+    flex-direction: column;
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 50%;
+    max-width: 120px;
+    background: rgba(246, 224, 158, 0.95);
+    text-align: center;
+    padding: 0.5rem;
+    border-radius: 0.5rem;
+    transition: transform 0.3s ease-in-out;
+    z-index: 100;
+  }
+
+  .header__nav--open {
+    display: flex;
+    transform: translateX(175%) translateY(10%);
+    background: none;
+  }
+
+  /* Mobile Nav Links */
+  .header__nav-link {
+    display: block;
+    width: 100%;
+    max-width: 100px;
+    padding: 0.3rem 0.5rem;
+    text-align: center;
+    font-size: 0.85rem;
+    border: 0.1rem solid #8b4513;
+    border-radius: 0.3rem;
+    margin: 0.2rem auto;
+  }
+
+  .header__logout-btn {
+    width: 100%;
+    background-color: rgba(232, 216, 163, 2);
+  }
+
+  /* Adjust Landing Page Header for Mobile */
+  .header--landing {
+    top: 10px;
+    height: 5vh;
+    max-width: 700px;
+    /* background-color: aqua; */
+    width: 92vw;
+  }
+
+  .header--landing .header__logo-image {
+    width: 2.5rem;
+    height: 2.5rem;
+  }
+
+  .header--landing .header__nav {
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    width: 6rem;
+    transform: translateX(190%);
+    background: none;
+    border-radius: 0.5rem;
+    padding: 0.3rem;
+    z-index: 1;
+    flex-direction: column;
+  }
+
+  .header--landing .header__nav-link {
+    font-size: 0.6rem;
+  }
 }

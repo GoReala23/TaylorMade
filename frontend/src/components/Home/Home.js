@@ -22,11 +22,12 @@ const Home = () => {
     updateCartItemQuantity,
   } = useContext(CartContext);
   const [isLoading, setIsLoading] = useState(true);
+  const { isLoggedIn } = useContext(AuthContext);
   const [error, setError] = useState(null);
   const [products, setProducts] = useState([]);
   const [mealPlans, setMealPlans] = useState([]);
   const [orders, setOrders] = useState([]);
-  const { favorites, addFavorite, removeFavorite, isLoggedIn } = useFavorites();
+  const { favorites, addFavorite, removeFavorite } = useFavorites();
   const [forceRender, setForceRender] = useState(false);
   const [featuredProducts, setFeaturedProducts] = useState([]);
   const [modalState, setModalState] = useState({
@@ -230,7 +231,7 @@ const Home = () => {
     if (title === 'Meal Plans') {
       return (
         <section className={`home__section ${mealPlanClassName}`}>
-          <div className='home__section-title'>{title}</div>
+          <p className='home__section-title'>{title}</p>
           <div className='home__grid home__grid-placeholder'>
             <div className='home__placeholder-message'>
               <h3>Cooking Up Some Delicious Plans!</h3>
@@ -255,7 +256,7 @@ const Home = () => {
 
     return (
       <section className='home__section'>
-        <div className='home__section-title'>{title}</div>
+        <h1 className='home__section-title'>{title}</h1>
         <div className='home__grid'>
           {items.slice(0, limit).map((product) => (
             <Card
@@ -291,7 +292,7 @@ const Home = () => {
     }
 
     if (!cartItems || cartItems.length === 0) {
-      return <p>Your cart is empty.</p>;
+      return <p className='home__cart-empty'>Your cart is empty.</p>;
     }
 
     return (
@@ -322,7 +323,9 @@ const Home = () => {
     );
   };
   return (
-    <div className='home__container'>
+    <div
+      className={`home__container ${isLoggedIn ? 'home__container--dashboard' : 'home__container--no-dashboard'}`}
+    >
       <PreviewOverlay
         isOpen={modalState.type === 'preview'}
         onClose={closeModal}

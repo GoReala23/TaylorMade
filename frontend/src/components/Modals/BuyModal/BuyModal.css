@@ -1,11 +1,11 @@
-.modal__content {
+/* .modal__content {
   position: relative;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
   background-color: rgba(246, 224, 158, 0.95);
   width: 100%;
   max-width: 500px;
   z-index: 1001;
-}
+} */
 
 .modal__form {
   display: flex;

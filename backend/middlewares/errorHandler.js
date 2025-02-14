@@ -1,6 +1,8 @@
 const express = require('express');
 const { celebrate } = require('celebrate');
 
+const { isCelebrateError } = require('celebrate');
+
 module.exports = {
   errorHandler: (err, req, res, next) => {
     const statusCode = err.statusCode || 500;

@@ -1,6 +1,6 @@
 .home__container {
   background-image: url('../../images/backgrounds/home__page-bkgrd.webp');
-  margin-top: 135px;
+  margin-top: 15%;
   padding: 20px;
   transition: all 0.3s ease;
   width: 100%;
@@ -9,6 +9,18 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #8b4513;
+}
+
+.home__container--no-dashboard {
+  margin-top: 10% !important;
+  padding: 0px !important;
+}
+
+.home__cart-empty {
+  color: black;
 }
 
 .home__section {
@@ -16,7 +28,7 @@
   border-radius: 8px;
   padding: 20px;
   margin-bottom: 30px;
-  width: 100vh;
+  width: 100%;
 }
 
 .home__section-title {
@@ -49,8 +61,8 @@
 
 .home__placeholder-message {
   text-align: center;
-
-  color: black;
+  /* 
+  color: black; */
   font-size: 20px;
 }
 
@@ -70,7 +82,7 @@
 
 .home__view-more {
   background: rgba(246, 224, 158, 0.95);
-  color: black;
+  /* color: black; */
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
@@ -80,4 +92,93 @@
 
 .home__view-more:hover {
   background-color: #e78c0ebd;
+}
+
+/* Media Queries */
+
+/* Mobile View */
+
+/* Tablet View/Laptop View */
+
+/* Desktop View */
+
+/* Large Screen View */
+
+@media screen and (min-width: 681px) and (max-width: 1024px) {
+  .home__container {
+    min-width: 75%;
+    display: flex;
+    align-content: flex-start;
+    align-items: center;
+    flex-wrap: wrap;
+    flex-direction: column;
+  }
+
+  .home__container--dashboard {
+    margin-top: 15% !important;
+  }
+
+  .home__section-title {
+    color: rgba(246, 224, 158, 0.95);
+  }
+
+  .home__grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media screen and (max-width: 680px) {
+  .home__grid {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .home__section {
+    display: flex;
+    background: rgba(246, 224, 158, 0.25);
+    border-color: #8b4513;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+}
+
+@media screen and (min-width: 1025px) {
+  .home__container {
+    margin-top: 7.5%;
+  }
+  /* .home__container--no-dashboard {
+    margin-top: 4.8% !important;
+    padding: 0px !important;
+  } */
+
+  .home__grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .home__section {
+    display: flex;
+    background: rgba(246, 224, 158, 0.5);
+    border-color: #8b4513;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 30px;
+    width: 100%;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .home__section-title {
+    font-size: 2.5rem;
+  }
+
+  .home__view-more {
+    font-size: 1.5rem;
+  }
 }

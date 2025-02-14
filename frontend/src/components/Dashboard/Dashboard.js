@@ -7,10 +7,10 @@ const Dashboard = () => {
   const [isLeftSide, setIsLeftSide] = useState(false);
   const { currentUser } = useContext(AuthContext);
 
-  const togglePosition = () => {
-    setIsLeftSide(!isLeftSide);
-    document.body.classList.toggle('dashboard__le ft');
-  };
+  // const togglePosition = () => {
+  //   setIsLeftSide(!isLeftSide);
+  //   document.body.classList.toggle('dashboard__left');
+  // };
 
   return (
     <div
@@ -18,12 +18,6 @@ const Dashboard = () => {
     >
       <nav className='dashboard__nav'>
         <ul className='dashboard__nav-list'>
-          <li className='dashboard__nav-item'>
-            <Link to='/' className='dashboard__nav-link'>
-              Home
-            </Link>
-          </li>
-
           <li className='dashboard__nav-item'>
             <Link to='/orders' className='dashboard__nav-link'>
               Orders
@@ -48,7 +42,7 @@ const Dashboard = () => {
           )}
         </ul>
       </nav>
-      <button className='dashboard__toggle' onClick={togglePosition}>
+      <button className='dashboard__toggle'>
         {isLeftSide ? 'Move to Top' : 'Move to Left'}
       </button>
     </div>

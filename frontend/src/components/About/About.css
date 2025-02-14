@@ -1,18 +1,18 @@
-.about {
+.About {
   display: flex;
   align-content: center;
   flex-direction: column;
   align-items: center;
-  min-height: calc(100vh - 135px);
-  margin-top: 135px;
+  min-height: 100vh;
   padding: 20px;
   width: 100%;
+  height: 100vh;
   background: rgba(246, 224, 158, 0.95);
   flex-wrap: wrap;
   justify-content: space-evenly;
 }
 
-.about__container {
+.About__container {
   max-width: 1200px;
   width: 100%;
   padding: 40px;
@@ -21,20 +21,20 @@
   background: rgba(255, 255, 255, 0.9);
 }
 
-.about__title {
+.About__title {
   color: #8b4513;
   font-size: 2.5rem;
   margin-bottom: 30px;
   text-align: center;
 }
 
-.about__content {
+.About__content {
   display: flex;
   flex-direction: column;
   gap: 20px;
 }
 
-.about__text {
+.About__text {
   font-size: 1.1rem;
   line-height: 1.6;
   color: #333;

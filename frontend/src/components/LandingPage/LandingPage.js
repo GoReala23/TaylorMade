@@ -22,37 +22,36 @@ const LandingPage = () => {
   };
 
   return (
-    <div className='landing'>
-      <div className='landing__container'>
-        <div className='landing__title-container'>
-          <h1 className='landing__title'>
-            <img
-              className='landing__title-image'
-              src={title}
-              alt='Taylor-Made'
-            />
-          </h1>
-          <p className='landing__subtitle'>
-            Home is where the food&#39;s good!
-          </p>
-        </div>
+    <main className='landing'>
+      <div className='landing__title-container'>
+        {/* <img className='landing__title-image' src={title} alt='Taylor-Made' /> */}
+
+        <p className='landing__subtitle'>Home is where the food&#39;s good!</p>
       </div>
+
       {!isLoggedIn && (
         <div className='landing__button-container'>
           <button
-            className='landing__button landing__button-register'
+            className='landing__button landing__button--register'
             onClick={() => handleOpenModal('register')}
             aria-label='Register'
           >
             Register
           </button>
           <button
-            className='landing__button landing__button-login'
+            className='landing__button landing__button--login'
             onClick={() => handleOpenModal('login')}
             aria-label='Login'
           >
             Login
           </button>
+
+          {/* Mobile Centered Button */}
+          <button
+            className='landing__button landing__button--mobile'
+            onClick={() => handleOpenModal('login')}
+            aria-label='Login or Register'
+          ></button>
         </div>
       )}
       {currentForm === 'login' ? (
@@ -70,7 +69,7 @@ const LandingPage = () => {
           onSwitchToLogin={formTabSwitch}
         />
       )}
-    </div>
+    </main>
   );
 };
 

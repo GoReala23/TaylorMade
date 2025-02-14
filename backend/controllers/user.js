@@ -3,14 +3,15 @@ const bcrypt = require('bcryptjs');
 const validator = require('validator');
 const User = require('../models/user');
 const { JWT_SECRET } = require('../utils/config');
-
-const BadRequestError = require('../errors/BadRequestError');
-const ConflictError = require('../errors/ConflictError');
-const UnauthorizedError = require('../errors/UnauthorizedError');
-const NotFoundError = require('../errors/NotFoundError');
-const ServerError = require('../errors/ServerError');
 const speakeasy = require('speakeasy');
 const qrcode = require('qrcode');
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+  NotFoundError,
+  ServerError,
+} = require('../errors/errors');
 
 const setupTwoFactor = async (req, res) => {
   try {

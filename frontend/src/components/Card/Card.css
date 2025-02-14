@@ -2,6 +2,7 @@
   border: 5px solid #8b4513;
   padding: 10px;
   display: flex;
+  min-width: 100%;
   flex-direction: column;
   background-color: rgba(246, 224, 158, 0.8);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -55,4 +56,47 @@
   margin-top: 5px;
   font-weight: bold;
   color: #8b4513;
+}
+
+/* Media Queries */
+
+/* Mobile View */
+
+@media screen and (width <= 680px) {
+  .card {
+    max-width: 300px;
+    width: 50vw;
+  }
+
+  .card__tite {
+    font-size: 1rem;
+  }
+
+  .card__info {
+    font-size: 0.8rem;
+  }
+
+  /* .card__image {
+    height: 65%;
+    width: 75%;
+  } */
+
+  .card__favorite-btn {
+    top: 0vh;
+    right: 0vw;
+  }
+
+  .card__featured-star {
+    top: 1.8vh;
+    left: 1.5vw;
+    width: 12%;
+    height: 12%;
+  }
+  .products__category-bar {
+    max-width: 90vw;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 0;
+  }
 }

@@ -23,46 +23,45 @@ const App = () => {
     <div className='App'>
       <Header />
       {isLoggedIn && <Dashboard />}
-      <Routes>
-        <Route
-          path='/'
-          element={!isLoggedIn ? <LandingPage /> : <Navigate to='/home' />}
-        />
-        <Route
-          path='/dashboard'
-          element={
-            isLoggedIn ? (
-              <Home />
-            ) : (
-              <Navigate to='/' state={{ openLogin: true }} />
-            )
-          }
-        />
-        <Route
-          path='/home'
-          element={isLoggedIn ? <Home /> : <Navigate to='/?login=true' />}
-        />
-        <Route path='/products' element={<Products />} />
-        <Route
-          path='/profile'
-          element={isLoggedIn ? <Profile /> : <Navigate to='/?login=true' />}
-        />
-        <Route
-          path='/orders'
-          element={isLoggedIn ? <Orders /> : <Navigate to='/' />}
-        />
-        <Route
-          path='/settings'
-          element={isLoggedIn ? <Settings /> : <Navigate to='/' />}
-        />
-        <Route
-          path='/cart'
-          element={isLoggedIn ? <CartModal /> : <Navigate to='/' />}
-        />
-        <Route path='/about' element={<About />} />
-        {/* <Route path='/locations' element={<Locations />} /> */}
-      </Routes>
-      <Footer />
+      <main className='App__content'>
+        <Routes>
+          <Route
+            path='/'
+            element={!isLoggedIn ? <LandingPage /> : <Navigate to='/home' />}
+          />
+          <Route
+            path='/dashboard'
+            element={
+              isLoggedIn ? (
+                <Home />
+              ) : (
+                <Navigate to='/' state={{ openLogin: true }} />
+              )
+            }
+          />
+          <Route path='/home' element={<Home />} />
+          <Route path='/products' element={<Products />} />
+          <Route
+            path='/profile'
+            element={isLoggedIn ? <Profile /> : <Navigate to='/?login=true' />}
+          />
+          <Route
+            path='/orders'
+            element={isLoggedIn ? <Orders /> : <Navigate to='/' />}
+          />
+          <Route
+            path='/settings'
+            element={isLoggedIn ? <Settings /> : <Navigate to='/' />}
+          />
+          <Route
+            path='/cart'
+            element={isLoggedIn ? <CartModal /> : <Navigate to='/' />}
+          />
+          <Route path='/about' element={<About />} />
+          {/* <Route path='/locations' element={<Locations />} /> */}
+        </Routes>
+        <Footer />
+      </main>
     </div>
   );
 };

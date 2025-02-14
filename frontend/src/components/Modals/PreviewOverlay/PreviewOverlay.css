@@ -101,3 +101,32 @@
   border-radius: 4px;
   cursor: pointer;
 }
+
+/* Media Queries */
+
+/* Mobile View */
+
+@media screen and (max-width: 768px) {
+  .preview__container {
+    max-width: 60%;
+    font-size: 0.8rem;
+  }
+
+  .preview__image {
+    max-height: 300px;
+  }
+}
+
+/* Tablet/Laptop View */
+
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .preview__container {
+    max-width: 80%;
+    font-size: 1rem;
+  }
+}
+
+/* Desktop View/Larger */
+
+@media screen and (min-width: 1025px) {
+}

@@ -8,6 +8,7 @@ import logo from '../../images/logo.webp';
 const Header = () => {
   const { isLoggedIn, logout, user } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNavOpen, setIsNavOpen] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
   const { login } = useContext(AuthContext);
 
@@ -22,19 +23,31 @@ const Header = () => {
     setShowLoginModal(!showLoginModal);
   };
 
+  const toggleNav = () => {
+    setIsNavOpen(!isNavOpen);
+  };
+
   return (
-    <header className={`header ${isLandingPage ? 'header__landing' : ''}`}>
+    <header
+      className={`header ${isLandingPage ? 'header--landing' : ''} ${!isLoggedIn ? 'header--no-dashboard' : 'header--dashboard'}`}
+    >
       <Link to='/' className='header__logo'>
         <img className='header__logo-image' src={logo} alt='Taylor-Made' />
       </Link>
-      <nav className='header__nav'>
-        <Link to='/products' className='header__nav-link'>
+      <button className='header__menu-toggle' onClick={toggleNav}>
+        ☰
+      </button>
+      <nav className={`header__nav ${isNavOpen ? 'header__nav--open' : ''}`}>
+        <Link to='/home' className='header__nav-link' onClick={toggleNav}>
+          Home
+        </Link>
+        <Link to='/products' className='header__nav-link' onClick={toggleNav}>
           Products
         </Link>
-        <Link to='/about' className='header__nav-link'>
+        <Link to='/about' className='header__nav-link' onClick={toggleNav}>
           About
         </Link>
-        <Link to='/locations' className='header__nav-link'>
+        <Link to='/locations' className='header__nav-link' onClick={toggleNav}>
           Locations
         </Link>
         {isLoggedIn ? (
@@ -42,7 +55,10 @@ const Header = () => {
             {user && (
               <span className='header__welcome'>Welcome, {user.name}</span>
             )}
-            <button onClick={logout} className='header__logout-btn'>
+            <button
+              onClick={logout}
+              className='header__nav-link header__logout-btn'
+            >
               Logout
             </button>
           </div>
@@ -50,7 +66,10 @@ const Header = () => {
           <Link
             to='/login'
             className='header__nav-link'
-            onClick={handleLoginClick}
+            onClick={(e) => {
+              handleLoginClick(e);
+              toggleNav();
+            }}
           >
             Login
           </Link>
