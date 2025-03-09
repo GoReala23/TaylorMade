@@ -142,7 +142,7 @@ The **backend** of TaylorMade is built with **Node.js & Express** and provides A
 🔹 **User Authentication** – JWT-based login & registration.  
 🔹 **Product Management** – CRUD operations on products.  
 🔹 **Order Processing** – Manage orders efficiently.  
-🔹 **Cart Management** – Add, update, and remove cart items.
+🔹 **Cart Management** – Add, update, save, and remove cart items.
 
 ---
 
