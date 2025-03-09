@@ -33,7 +33,7 @@ TaylorMade is a full-stack e-commerce application designed for browsing and purc
 - **React.js**
 - **React Router**
 - **Context API**
-- **CSS3**
+- **CSS**
 
 ### Backend
 
