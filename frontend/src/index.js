@@ -5,6 +5,7 @@ import './index.css';
 import App from './components/App/App';
 import { AuthProvider } from './context/AuthContext';
 import { FeaturedProductsProvider } from './context/FeaturedProductsContext';
+import { ProductsProvider } from './context/ProductsContext';
 import reportWebVitals from './reportWebVitals';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { CartProvider } from './context/CartContext';
@@ -14,13 +15,16 @@ root.render(
   <React.StrictMode>
     <HashRouter>
       <AuthProvider>
-        <FeaturedProductsProvider>
-          <FavoritesProvider>
-            <CartProvider>
-              <App />
-            </CartProvider>
-          </FavoritesProvider>
-        </FeaturedProductsProvider>
+        <ProductsProvider>
+          {' '}
+          <FeaturedProductsProvider>
+            <FavoritesProvider>
+              <CartProvider>
+                <App />
+              </CartProvider>
+            </FavoritesProvider>
+          </FeaturedProductsProvider>
+        </ProductsProvider>
       </AuthProvider>
     </HashRouter>
   </React.StrictMode>,

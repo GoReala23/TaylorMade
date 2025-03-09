@@ -28,9 +28,14 @@
     "winston": "^3.17.0"
   },
   "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
     "@types/cors": "^2.8.17",
     "@types/jsonwebtoken": "^9.0.7",
-    "nodemon": "^3.1.7"
+    "@types/qrcode": "^1.5.5",
+    "@types/speakeasy": "^2.0.10",
+    "@types/validator": "^13.12.2",
+    "nodemon": "^3.1.7",
+    "typescript": "^5.7.3"
   },
   "description": ""
 }

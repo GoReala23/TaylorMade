@@ -28,7 +28,7 @@
 /* Media Queries */
 
 /* Mobile View */
-@media screen and (width < 768px) {
+@media screen and (min-width: 768px) {
   .footer {
     height: 10vh;
     max-width: 680px;
@@ -41,7 +41,7 @@
 }
 
 /* Tablet View */
-@media screen and (width > 768px) and (width <= 1024px) {
+@media screen and (min-width: 768px) and (max-width: 1024px) {
   .footer {
     max-height: 8vh;
   }
@@ -50,13 +50,13 @@
   }
 }
 
-@media screen and (width >= 768) {
+@media screen and (min-width: 1025px) {
   .footer {
     height: 10vh;
-    max-width: 680px;
+    max-width: 100%;
   }
 
   .footer__text {
-    font-size: 0.2rem;
+    font-size: 0.5em;
   }
 }

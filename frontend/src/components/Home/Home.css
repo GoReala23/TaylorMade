@@ -1,6 +1,6 @@
-.home__container {
+.home {
   background-image: url('../../images/backgrounds/home__page-bkgrd.webp');
-  margin-top: 15%;
+  margin-top: 14.5%;
   padding: 20px;
   transition: all 0.3s ease;
   width: 100%;
@@ -14,8 +14,8 @@
   color: #8b4513;
 }
 
-.home__container--no-dashboard {
-  margin-top: 10% !important;
+.home--no-dashboard {
+  margin-top: 4.8% !important;
   padding: 0px !important;
 }
 
@@ -39,7 +39,7 @@
 
 .home__grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 20px;
 }
 
@@ -82,7 +82,7 @@
 
 .home__view-more {
   background: rgba(246, 224, 158, 0.95);
-  /* color: black; */
+  border: 3px solid #8b4513;
   padding: 10px 20px;
   border-radius: 5px;
   cursor: pointer;
@@ -105,8 +105,9 @@
 /* Large Screen View */
 
 @media screen and (min-width: 681px) and (max-width: 1024px) {
-  .home__container {
+  .home {
     min-width: 75%;
+    margin-top: 16vh;
     display: flex;
     align-content: flex-start;
     align-items: center;
@@ -114,12 +115,19 @@
     flex-direction: column;
   }
 
-  .home__container--dashboard {
+  .home__title {
+    color: rgba(246, 224, 158, 0.95);
+  }
+
+  .home--dashboard {
+    margin-top: 27% !important;
+  }
+
+  .home--no-dashboard {
     margin-top: 15% !important;
   }
 
-  .home__section-title {
-    color: rgba(246, 224, 158, 0.95);
+  .home__section {
   }
 
   .home__grid {
@@ -134,7 +142,7 @@
 
   .home__section {
     display: flex;
-    background: rgba(246, 224, 158, 0.25);
+    /* background: rgba(246, 224, 158, 0.25); */
     border-color: #8b4513;
     border-radius: 8px;
     padding: 20px;
@@ -148,13 +156,18 @@
 }
 
 @media screen and (min-width: 1025px) {
-  .home__container {
-    margin-top: 7.5%;
+  .home {
+    margin-top: 8.5%;
   }
-  /* .home__container--no-dashboard {
-    margin-top: 4.8% !important;
+  .home--dashboard {
+    margin-top: 11.1% !important;
     padding: 0px !important;
-  } */
+  }
+
+  .home--no-dashboard {
+    margin-top: 5.4% !important;
+    padding: 0px !important;
+  }
 
   .home__grid {
     grid-template-columns: repeat(3, 1fr);
@@ -180,5 +193,27 @@
 
   .home__view-more {
     font-size: 1.5rem;
+  }
+}
+
+@media screen and (min-width: 320px) and (max-width: 680px) {
+  .home {
+    margin-top: 40%;
+  }
+
+  .home--dashboard {
+    margin-top: 41% !important;
+  }
+  .home--no-dashboard {
+    margin-top: 2% !important;
+    padding: 0px !important;
+  }
+
+  .home__title {
+    color: rgba(246, 224, 158, 0.95);
+  }
+
+  .home__section {
+    margin-top: 50%;
   }
 }

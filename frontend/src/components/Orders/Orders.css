@@ -1,7 +1,7 @@
 .orders {
   min-height: 100vh;
   padding: 30px;
-  margin-top: 6.8vh;
+  /* margin-top: 6.8vh; */
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -12,6 +12,13 @@
   background: rgba(246, 224, 158, 0.95);
 }
 
+.orders__empty {
+  min-height: 100vh;
+}
+
+orders--dashboard {
+  margin-top: 0 !important;
+}
 .orders__container {
   display: flex;
   max-width: 1200px;
@@ -140,6 +147,12 @@
 
 /* Mobile View/ Small Screen View */
 
+@media screen and (min-width: 320px) and (max-width: 679px) {
+  .orders--dashboard {
+    margin-top: 41% !important;
+  }
+}
+
 @media screen and (max-width: 680px) {
   .orders {
     margin-top: 19vh;
@@ -163,6 +176,10 @@
 @media screen and (min-width: 1025px) {
   .orders {
     margin-top: 15vh;
+  }
+
+  .orders--dashboard {
+    margin-top: 11.1% !important;
   }
 
   .orders__container {

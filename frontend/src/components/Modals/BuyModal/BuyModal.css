@@ -10,7 +10,7 @@
 .modal__form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  /* gap: 16px; */
   position: relative;
   padding: 15px;
 }
@@ -49,4 +49,15 @@
   color: #dc3545;
   font-size: 12px;
   margin-top: 4px;
+}
+
+@media screen and (min-width: 1024px) {
+  .modal__content {
+    height: 90%;
+  }
+
+  .modal__form {
+    max-width: 400px;
+    height: auto;
+  }
 }

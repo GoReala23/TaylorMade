@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import { useAuth } from './AuthContext';
 import Api from '../utils/Api';
 
@@ -12,7 +12,7 @@ export const CartProvider = ({ children }) => {
     return saved ? JSON.parse(saved) : [];
   });
 
-  const fetchCart = async () => {
+  const fetchCart = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
 
@@ -32,8 +32,7 @@ export const CartProvider = ({ children }) => {
       console.error('Error fetching cart:', error);
       setCartItems([]);
     }
-  };
-
+  });
   const getSavedItems = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -62,6 +61,7 @@ export const CartProvider = ({ children }) => {
     try {
       const token = localStorage.getItem('token');
       await Api.addToCart({ productId, quantity }, token);
+
       await fetchCart();
     } catch (error) {
       console.error('Error adding to cart:', error);
@@ -107,18 +107,14 @@ export const CartProvider = ({ children }) => {
   };
   const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await Api.updateSavedItemQuantity(
-        savedItemId,
-        newQuantity,
-        token,
+      setSavedItems((prev) =>
+        prev.map((item) =>
+          item._id === savedItemId ? { ...item, quantity: newQuantity } : item,
+        ),
       );
 
-      if (response && response.savedItems) {
-        setSavedItems(response.savedItems);
-      } else {
-        console.warn('Unexpected response format from API:', response);
-      }
+      const token = localStorage.getItem('token');
+      await Api.updateSavedItemQuantity(savedItemId, newQuantity, token);
     } catch (error) {
       console.error('Error updating saved item quantity:', error);
     }

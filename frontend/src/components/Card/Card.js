@@ -2,6 +2,7 @@ import React, { useContext, useState, useMemo } from 'react';
 import { FaHeart, FaStar, FaPlus, FaMinus } from 'react-icons/fa';
 import PropTypes from 'prop-types';
 import { useFavorites } from '../../context/FavoritesContext';
+import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import './Card.css';
 import { CartContext } from '../../context/CartContext';
 
@@ -12,13 +13,14 @@ export const formatProductData = (productFormatted) => {
     imageUrl: productFormatted.imageUrl.startsWith('http')
       ? productFormatted.imageUrl
       : `http://localhost:5000${productFormatted.imageUrl}`,
-
     price: productFormatted.price || productFormatted.item?.price || 0,
     description: productFormatted.description || 'No description available',
     isSaved: productFormatted.isSaved || false,
     savedQuantity: productFormatted.savedQuantity || 1,
     servings: productFormatted.servings || 1,
-    isFeatured: productFormatted.isFeatured || false,
+    isFeatured:
+      productFormatted.isFeatured ||
+      (productFormatted.categories?.includes('Featured') ?? false),
   };
 };
 
@@ -40,13 +42,15 @@ const Card = ({
   ...props
 }) => {
   const { favorites } = useFavorites();
+  const { featuredProducts } = useFeaturedProducts();
   const [quantity, setQuantity] = useState(initialQuantity);
   const {
     handleQuantityChange,
     updateSavedItemQuantity,
     updateCartItemQuantity,
   } = useContext(CartContext);
-
+  const { isFeatured: isFeaturedProduct } =
+    featuredProducts.find((p) => p._id === product._id) || {};
   const isLiked = favorites?.some((fav) => fav._id === product._id);
   const [localQuantity, setLocalQuantity] = useState(initialQuantity);
 
@@ -57,7 +61,7 @@ const Card = ({
     return null;
   }
 
-  const { name, price, description, imageUrl } = formattedProduct;
+  const { name, price, description, imageUrl, isf } = formattedProduct;
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -86,14 +90,17 @@ const Card = ({
       <div className='card__image-container'>
         <img
           onError={(e) => {
-            e.target.src = '/Images/products/default.jpg'; // Fallback image
+            e.target.src = '/Images/products/default.jpg';
             console.warn('Image failed to load, using fallback');
           }}
           src={imageUrl}
           alt={name}
           className='card__image'
         />
-        {isFeatured && <FaStar className='card__featured-star' color='gold' />}
+
+        {isFeatured && (
+          <FaStar className='card__featured-star' size={20} color='gold' />
+        )}
         <button
           className='card__favorite-btn'
           onClick={(e) => {
@@ -174,7 +181,7 @@ const Card = ({
             <FaPlus />
           </button>
           <p className='card__price-per-quantity'>
-            Total: ${(price * localQuantity).toFixed(2)}
+            Total: ${parseFloat(price * localQuantity).toFixed(2)}
           </p>
         </div>
       )}

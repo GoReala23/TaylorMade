@@ -9,10 +9,14 @@
   transition: all 0.3s ease;
 }
 
-.dashboard--left {
+.dashboard__left {
   width: 250px;
   height: calc(100vh - 70px);
   right: auto;
+}
+
+.dashboard__top {
+  width: 100%;
 }
 
 .dashboard__nav {
@@ -29,7 +33,7 @@
   list-style-type: none;
 }
 
-.dashboard--left .dashboard__nav-list {
+.dashboard__left .dashboard__nav-list {
   flex-direction: column;
   justify-content: flex-start;
   padding-top: 20px;
@@ -77,16 +81,7 @@
   background: rgba(210, 180, 140, 1);
 }
 
-/* Adjust main content area */
-body.dashboard-left .main-content {
-  margin-left: 250px;
-}
-
 /* Media Queries */
-
-/*Small Devices Less Than 680px*/
-
-/* Small Screens */
 @media screen and (max-width: 680px) {
   .dashboard {
     top: 0;
@@ -100,7 +95,7 @@ body.dashboard-left .main-content {
   }
 
   .dashboard__nav-item {
-    max-width: 12vw;
+    /* max-width: 12vw; */
   }
 
   .dashboard__nav-link {
@@ -110,10 +105,7 @@ body.dashboard-left .main-content {
   }
 }
 
-/* Mobile View */
-
-/* Tablet View/Laptop View */
-
+/* Tablet View */
 @media screen and (min-width: 681px) and (max-width: 1024px) {
   .dashboard {
     top: 0;
@@ -136,7 +128,6 @@ body.dashboard-left .main-content {
 }
 
 /* Desktop View */
-
 @media screen and (min-width: 1025px) {
   .dashboard {
     top: 0%;
@@ -172,7 +163,7 @@ body.dashboard-left .main-content {
     display: none;
   }
 
-  .dashboard--left {
+  .dashboard__left {
     width: 200px;
   }
 }

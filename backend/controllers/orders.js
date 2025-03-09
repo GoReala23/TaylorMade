@@ -3,6 +3,13 @@ const User = require('../models/user');
 const Order = require('../models/orders');
 const Item = require('../models/item');
 
+const {
+  BadRequestError,
+  NotFoundError,
+  UnauthorizedError,
+  ServerError,
+} = require('../errors/errors');
+
 // Admin controllers
 const updateOrderStatus = async (req, res) => {
   try {
@@ -19,7 +26,7 @@ const updateOrderStatus = async (req, res) => {
       'cancelled',
     ];
     if (!validStatuses.includes(status)) {
-      return res.status(400).json({ message: 'Invalid status' });
+      return next(new BadRequestError('Invalid order status'));
     }
 
     const order = await Order.findByIdAndUpdate(
@@ -29,15 +36,13 @@ const updateOrderStatus = async (req, res) => {
     );
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return next(new NotFoundError('Order not found'));
     }
-    console.log(
-      `Received request to update order ${orderId} to status ${status}`
-    );
+
     res.status(200).json(order);
   } catch (err) {
     console.error('Server error updating order status:', err.message);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('Server error while updating order status'));
   }
 };
 
@@ -45,12 +50,12 @@ const removeOrder = async (req, res) => {
   try {
     // Validate order ID format
     if (!mongoose.Types.ObjectId.isValid(req.params.orderId)) {
-      return res.status(400).json({ message: 'Invalid order ID format' });
+      return next(new BadRequestError('Invalid order ID format'));
     }
 
     // Check if the user is an admin
     if (!req.user.isAdmin) {
-      return res.status(403).json({ message: 'Only admins can remove orders' });
+      return next(new UnauthorizedError('Admin access required'));
     }
 
     // Find and delete the order
@@ -58,17 +63,16 @@ const removeOrder = async (req, res) => {
 
     // Check if order exists
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return next(new NotFoundError('Order not found'));
     }
 
     res.json({ message: 'Order removed successfully', order });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    next(new ServerError('An error occurred while removing the order'));
   }
 };
 
-// User controllers
-
+// Normalize item
 const normalizeItem = (item) => {
   return {
     _id: item._id,
@@ -83,6 +87,7 @@ const normalizeItem = (item) => {
   };
 };
 
+// Create a new order
 const createOrder = async (req, res) => {
   try {
     console.log('Create order request:', req.body);
@@ -90,27 +95,21 @@ const createOrder = async (req, res) => {
     const userId = req.user.userId;
 
     if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+      return next(new UnauthorizedError('User not authenticated'));
     }
-    console.log(userId);
 
     if (!productId) {
-      return res.status(400).json({
-        error: 'Missing itemId. Please include a valid itemId in your request.',
-      });
+      return next(new BadRequestError('Product ID is required'));
     }
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return res.status(400).json({
-        error:
-          'Invalid itemId. Please provide a valid 24-character hexadecimal string.',
-      });
+      return next(new BadRequestError('Invalid product ID format'));
     }
 
     // Check if the item exists using the Item model
     const item = await Item.findById(productId);
     if (!item) {
-      return res.status(404).json({ error: 'Item not found' });
+      return rnext(new NotFoundError('Item not found'));
     }
 
     // Calculate the total price
@@ -131,9 +130,7 @@ const createOrder = async (req, res) => {
     res.status(201).json(order);
   } catch (err) {
     console.error('Error creating order:', err.message);
-    res
-      .status(500)
-      .json({ error: 'Internal Server Error', message: err.message });
+    next(new ServerError('An error occurred while creating the order'));
   }
 };
 
@@ -142,28 +139,25 @@ const cancelOrder = async (req, res) => {
     const order = await Order.findById(req.params.orderId);
 
     if (!order) {
-      return res.status(404).json({ message: 'Order not found' });
+      return next(new NotFoundError('Order not found'));
     }
 
     // Check if the user owns this order
     if (order.user.toString() !== req.user.userId.toString()) {
-      return res
-        .status(403)
-        .json({ message: 'Not authorized to cancel this order' });
+      return next(new UnauthorizedError('You do not own this order'));
     }
 
     // Check if the order is in a cancellable status
     if (order.status !== 'pending') {
-      return res
-        .status(400)
-        .json({ message: 'Order cannot be canceled at this stage' });
+      return next(new BadRequestError('Order cannot be canceled'));
     }
 
     order.status = 'canceled';
     await order.save();
     res.json({ message: 'Order canceled successfully', order });
   } catch (error) {
-    res.status(500).json({ message: 'Server error', error: error.message });
+    console.error('Error canceling order:', error);
+    next(new ServerError('An error occurred while canceling the order'));
   }
 };
 
@@ -182,13 +176,13 @@ const getUserOrders = async (req, res) => {
     res.status(200).json(normalizedOrders);
   } catch (err) {
     console.error('Error fetching user orders:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while fetching user orders'));
   }
 };
 const getAllOrders = async (req, res) => {
   try {
     if (!req.user || !req.user.isAdmin) {
-      return res.status(403).json({ error: 'Admin access required' });
+      return next(new UnauthorizedError('Admin access required'));
     }
 
     const orders = await Order.find().populate(
@@ -203,16 +197,16 @@ const getAllOrders = async (req, res) => {
     res.status(200).json(normalizedOrders);
   } catch (err) {
     console.error('Error fetching orders:', err);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while fetching orders'));
   }
 };
 
 // Get orders by item
-const getOrdersByItem = async (req, res) => {
+const getOrdersByItem = async (req, res, next) => {
   const { itemId } = req.params;
 
   try {
-    const orders = await Order.find({ itemId: itemId }).populate(
+    const orders = await Order.find({ item: itemId }).populate(
       'user',
       'name email'
     );
@@ -222,12 +216,12 @@ const getOrdersByItem = async (req, res) => {
     }));
 
     if (normalizedOrders.length === 0) {
-      return res.status(404).json({ message: 'No orders found for this item' });
+      return next(new NotFoundError('No orders found for this item'));
     }
     res.status(200).json(normalizedOrders);
   } catch (err) {
     console.error('Error fetching orders by item:', err.message);
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while fetching orders by item'));
   }
 };
 

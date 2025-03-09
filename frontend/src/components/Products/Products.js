@@ -1,106 +1,91 @@
-import React, { useState, useContext, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState, useContext } from 'react';
+import { useLocation } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
 import { useFavorites } from '../../context/FavoritesContext';
+import { ProductsContext } from '../../context/ProductsContext';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import BuyModal from '../Modals/BuyModal/BuyModal';
-import Api from '../../utils/Api';
 import Card, { formatProductData } from '../Card/Card';
 import './Products.css';
 
-const Products = () => {
-  const { addToCart } = useContext(CartContext);
+const Products = ({
+  addToCart,
+  likeItem,
+  openPreview,
+  openBuyModal,
+  modalStates = {},
+  setModalStates,
+  closeModal,
+}) => {
+  const { products } = useContext(ProductsContext);
   const { favorites, addFavorite, removeFavorite } = useFavorites();
-  const navigate = useNavigate();
-
-  const [products, setProducts] = useState([]);
+  const { isLoggedIn } = useContext(AuthContext);
+  const { addToCart: addToCartContext } = useContext(CartContext);
+  const location = useLocation();
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
-  const [modalStates, setModalStates] = useState({
-    showPreview: false,
-    showBuyModal: false,
-    previewProduct: null,
-    productToBuy: null,
-  });
   const [previewQuantity, setPreviewQuantity] = useState(1);
 
-  const normalizeProductData = (product) => {
-    return {
-      _id: product._id || product.id, // Support different ID formats
-      name: product.name || product.title || 'Unknown Product',
-      price: product.price || 0,
-      description: product.description || 'No description available',
-      imageUrl:
-        product.image || product.imageUrl?.startsWith('http')
-          ? product.imageUrl
-          : `http://localhost:5000${product.imageUrl}`, // Local fallback
-      isFeatured: product.isFeatured || false,
-      categories: product.categories || [],
-      isSaved: product.isSaved || false,
-      savedQuantity: product.savedQuantity || 1,
-    };
-  };
+  useEffect(() => {
+    // Fetch categories from products
+    const fetchedCategories = [
+      'All',
+      'Featured',
+      'Favorites',
+      ...new Set(products.flatMap((product) => product.categories || [])),
+    ];
+    setCategories(fetchedCategories);
+    setLoading(false);
+  }, [products]);
 
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const localProducts = await Api.getItems();
+    const query = new URLSearchParams(location.search);
+    const category = query.get('category');
+    if (category) {
+      setSelectedCategory(category.charAt(0).toUpperCase() + category.slice(1));
+    }
+  }, [location]);
 
-        const normalizedProducts = localProducts.map(normalizeProductData);
-
-        // Extract unique categories
-        const uniqueCategories = [
-          'All',
-          'Featured',
-          ...new Set(
-            normalizedProducts.flatMap((product) => product.categories || []),
-          ),
-        ];
-
-        setCategories(uniqueCategories);
-        setProducts(normalizedProducts);
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching products:', error);
-      }
-    };
-
-    fetchProducts();
-  }, []);
-
-  const openPreview = (product) => {
-    setModalStates({
+  const handleShowPreview = (product) => {
+    setModalStates((prev) => ({
+      ...prev,
       showPreview: true,
+      previewProduct: formatProductData(product),
       showBuyModal: false,
-      previewProduct: product,
       productToBuy: null,
-    });
+    }));
   };
 
-  const openBuyModal = (product) => {
-    setModalStates({
-      showPreview: false,
+  const handleShowBuyModal = (product) => {
+    setModalStates((prev) => ({
+      ...prev,
       showBuyModal: true,
+      productToBuy: formatProductData(product),
+      showPreview: false,
       previewProduct: null,
-      productToBuy: product,
-    });
+    }));
   };
 
   const handleAddToCart = (product) => {
-    addToCart(product, 1);
+    addToCartContext(product, 1);
   };
 
   const handlePurchase = async () => {
     try {
-      await addToCart(modalStates.productToBuy, previewQuantity);
-      navigate('/orders');
+      if (!modalStates.productToBuy || !modalStates.productToBuy._id) {
+        throw new Error('Invalid product data');
+      }
+      setModalStates((prev) => ({
+        ...prev,
+        type: 'buy',
+        showBuyModal: true,
+        productToBuy: modalStates.productToBuy,
+      }));
     } catch (error) {
       console.error('Error processing purchase:', error);
       alert('Failed to process purchase. Please try again.');
-    } finally {
-      setModalStates((prev) => ({ ...prev, showBuyModal: false }));
     }
   };
 
@@ -119,9 +104,9 @@ const Products = () => {
       product={formatProductData(product)}
       isFeatured={product.isFeatured}
       onAddToCart={() => handleAddToCart(product)}
-      onBuyNow={() => openBuyModal(product)}
+      onBuyNow={() => handleShowBuyModal(product)}
       onFavorite={() => toggleFavorite(product)}
-      onClick={() => openPreview(product)}
+      onClick={() => handleShowPreview(product)}
     />
   );
 
@@ -129,6 +114,8 @@ const Products = () => {
     const productsToRender = products.filter((product) => {
       if (selectedCategory === 'All') return true;
       if (selectedCategory === 'Featured') return product.isFeatured;
+      if (selectedCategory === 'Favorites')
+        return favorites.some((fav) => fav._id === product._id);
       return product.categories?.includes(selectedCategory);
     });
     return (
@@ -143,7 +130,9 @@ const Products = () => {
   }
 
   return (
-    <div className='products'>
+    <div
+      className={`products ${isLoggedIn ? 'products--dashboard' : 'products--no-dashboard'}`}
+    >
       <div className='products__container'>
         <div className='products__category-bar'>
           {categories.map((category) => (
@@ -160,19 +149,19 @@ const Products = () => {
         </div>
         {renderCategory()}
         <PreviewOverlay
-          isOpen={modalStates.showPreview}
+          isOpen={modalStates?.showPreview || false}
           onClose={() =>
             setModalStates((prev) => ({ ...prev, showPreview: false }))
           }
-          product={modalStates.previewProduct}
-          onBuyNow={openBuyModal}
+          product={modalStates?.previewProduct}
           quantity={previewQuantity}
+          isLiked={favorites.some(
+            (fav) => fav._id === modalStates?.previewProduct?._id,
+          )}
           onQuantityChange={(newQuantity) => setPreviewQuantity(newQuantity)}
           onAddToCart={() => handleAddToCart(modalStates.previewProduct)}
+          onBuyNow={() => handleShowBuyModal(modalStates.previewProduct)}
           onFavorite={toggleFavorite}
-          isLiked={favorites.some(
-            (fav) => fav._id === modalStates.previewProduct?._id,
-          )}
         />
 
         {modalStates.showBuyModal && (

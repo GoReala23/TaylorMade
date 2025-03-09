@@ -1,280 +1,136 @@
-import React, { useState, useEffect, useContext, useRef } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaHeart, FaStar } from 'react-icons/fa';
 import { AuthContext } from '../../context/AuthContext';
+import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import BuyModal from '../Modals/BuyModal/BuyModal';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Card, { formatProductData } from '../Card/Card';
-import Api from '../../utils/Api';
 import './Home.css';
 
-const Home = () => {
+const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
   const navigate = useNavigate();
+  const { isLoggedIn } = useContext(AuthContext);
   const {
     cartItems,
     addToCart,
     removeFromCart,
-    fetchCart,
-    saveForLater,
-
     updateCartItemQuantity,
+    saveForLater,
+    moveToCart,
+    removeSavedItem,
+    fetchCart,
+    getSavedItems,
   } = useContext(CartContext);
-  const [isLoading, setIsLoading] = useState(true);
-  const { isLoggedIn } = useContext(AuthContext);
-  const [error, setError] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [mealPlans, setMealPlans] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const { favorites, addFavorite, removeFavorite } = useFavorites();
-  const [forceRender, setForceRender] = useState(false);
-  const [featuredProducts, setFeaturedProducts] = useState([]);
-  const [modalState, setModalState] = useState({
-    type: null,
-    product: null,
-    quantity: 1,
+  const { favorites, toggleFavorite } = useFavorites();
+  const { featuredProducts } = useFeaturedProducts();
+  const [modalStates, setModalStates] = useState({
+    showPreview: false,
+    showBuyModal: false,
+    previewProduct: null,
+    productToBuy: null,
   });
-  const previewRef = useRef(null);
+  const [previewQuantity, setPreviewQuantity] = useState(1);
 
   useEffect(() => {
-    const fetchFeaturedProducts = async () => {
+    const initializeData = async () => {
       try {
-        const fetchedProducts = await Api.getFeaturedProducts();
-
-        setFeaturedProducts(fetchedProducts);
-        console.log('fetchedProducts:', fetchedProducts);
-        const validProducts = fetchedProducts.filter(
-          (product) =>
-            product &&
-            product.name &&
-            product.price !== undefined &&
-            product.imageUrl,
-        );
-        setFeaturedProducts(validProducts);
-        console.log('fetchedProducts:', fetchedProducts);
-      } catch (err) {
-        setError('Error fetching featured products');
-      } finally {
-        setIsLoading(false);
+        await fetchItems();
+        if (isLoggedIn) {
+          await Promise.all([fetchOrders(), fetchCart(), getSavedItems()]);
+        }
+      } catch (error) {
+        console.error('Error initializing data:', error);
       }
     };
+    initializeData();
+  }, [isLoggedIn, fetchItems, fetchOrders, fetchCart, getSavedItems]);
 
-    fetchFeaturedProducts();
-  }, []);
+  useEffect(() => {}, [featuredProducts]);
 
-  const openPreview = (product) => {
-    setModalState({
-      type: 'preview',
-      product: formatProductData(product),
-      quantity: 1,
-    });
+  const handleShowPreview = (product) => {
+    setModalStates((prev) => ({
+      ...prev,
+      showPreview: true,
+      previewProduct: formatProductData(product),
+      showBuyModal: false,
+      productToBuy: null,
+    }));
   };
 
-  const openBuyModal = (product, quantity = 1) => {
-    setModalState({
-      type: 'buy',
-      product: formatProductData(product),
-      quantity,
-    });
+  const handleShowBuyModal = (product) => {
+    setModalStates((prev) => ({
+      ...prev,
+      showBuyModal: true,
+      productToBuy: formatProductData(product),
+      showPreview: false,
+      previewProduct: null,
+    }));
+  };
+
+  const handleAddToCart = (product) => {
+    addToCart(product, 1);
+  };
+
+  const handlePurchase = async () => {
+    try {
+      if (!modalStates.productToBuy || !modalStates.productToBuy._id) {
+        throw new Error('Invalid product data');
+      }
+      setModalStates((prev) => ({
+        ...prev,
+        type: 'buy',
+        showBuyModal: true,
+        productToBuy: modalStates.productToBuy,
+      }));
+    } catch (error) {
+      console.error('Error processing purchase:', error);
+      alert('Failed to process purchase. Please try again.');
+    }
   };
 
   const closeModal = () => {
-    setModalState({
-      type: null,
-      product: null,
-      quantity: 1,
+    setModalStates({
+      showPreview: false,
+      showBuyModal: false,
+      previewProduct: null,
+      productToBuy: null,
     });
   };
 
-  const handleBuyNow = async (product) => {
-    // Directly set the modalState to open the BuyModal
-    setModalState({
-      type: 'buy',
-      product: formatProductData(product),
-      quantity: 1,
-    });
-  };
-  const handleAddToCart = async (product) => {
-    if (!product || !product._id) {
-      console.error('Invalid product data');
-      return;
-    }
-    try {
-      await addToCart({
-        productId: product._id,
-        quantity: 1,
-      });
-    } catch (err) {
-      console.error('Error adding to cart:', error);
-    }
-  };
-
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setIsLoading(true);
-        const fetchedProducts = await Api.getItems();
-
-        const validProducts = fetchedProducts.filter(
-          (product) =>
-            product &&
-            product.name &&
-            product.price !== undefined &&
-            product.imageUrl,
-        );
-        setProducts(validProducts);
-      } catch (productError) {
-        console.error('Error fetching products:', error);
-        setError(error.message);
-      } finally {
-        // setIsLoading(false);
-      }
-    };
-    fetchProducts();
-  }, []);
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        const fetchedOrders = await Api.getUserOrders(token);
-        setOrders(fetchedOrders);
-      } catch (orderError) {
-        console.error('Error fetching orders:', error);
-      }
-    };
-
-    fetchOrders();
-  }, []);
   const handleViewMore = (section) => {
-    switch (section) {
-      case 'Featured Products':
-        navigate('/products', { state: { filter: 'featured' } });
-        break;
-      case 'Products':
-        navigate('/products');
-        break;
-      case 'Favorites':
-        navigate('/favorites');
-        break;
-      case 'Meal Plans':
-        navigate('/meal-plans');
-        break;
-      case 'Orders':
-        navigate('/orders');
-        break;
-      case 'Cart':
-        navigate('/cart');
-        break;
-      default:
-        navigate('/products');
-    }
-  };
-
-  const handleSaveForLater = (productId) => {
-    try {
-      saveForLater(productId);
-    } catch (saveError) {
-      console.error('Error saving item for later:', error);
-    }
-  };
-
-  const toggleFavorite = (product) => {
-    if (!favorites || !Array.isArray(favorites)) return;
-    const isFavorite = favorites.some((fav) => fav._id === product._id);
-    if (isFavorite) {
-      removeFavorite(product._id);
+    if (section === 'Favorite Items') {
+      navigate('/products?category=favorites');
     } else {
-      addFavorite(product);
+      navigate(`/${section.toLowerCase().replace(' ', '-')}`);
     }
   };
-  const renderOrdersSection = () => {
-    if (orders.length === 0) {
-      return <p>You have no orders.</p>;
-    }
+
+  const renderProductGrid = (productList, title, limit = 4) => {
+    if (!productList || productList.length === 0) return null;
 
     return (
       <section className='home__section'>
-        <div className='home__section-title'>My Orders</div>
+        <h1 className='home__title'>{title}</h1>
         <div className='home__grid'>
-          {orders.slice(0, 4).map((order) => {
-            const product = order.item[0];
+          {productList.slice(0, limit).map((product) => {
+            const isFeatured = featuredProducts.some(
+              (featuredProduct) => featuredProduct._id === product._id,
+            );
+
             return (
               <Card
-                key={order._id}
-                product={{ ...product, price: product.price || order.price }}
-                isFeatured={product.isFeatured}
-                isAdmin={false}
+                key={product._id}
+                product={product}
+                isFeatured={isFeatured}
                 onAddToCart={() => handleAddToCart(product)}
-                onBuyNow={() => handleBuyNow(product)}
+                onBuyNow={() => handleShowBuyModal(product)}
                 onFavorite={toggleFavorite}
-                onClick={() => openPreview(product)}
-                showQuantity={false}
-                initialQuantity={1}
+                onClick={() => handleShowPreview(product)}
               />
             );
           })}
-        </div>
-        <button
-          className='home__view-more'
-          onClick={() => handleViewMore('Orders')}
-        >
-          View More
-        </button>
-      </section>
-    );
-  };
-
-  const renderProductGrid = (items, title, limit = 4) => {
-    const mealPlanClassName = 'home__meal-plan-section';
-    if (title === 'Meal Plans') {
-      return (
-        <section className={`home__section ${mealPlanClassName}`}>
-          <p className='home__section-title'>{title}</p>
-          <div className='home__grid home__grid-placeholder'>
-            <div className='home__placeholder-message'>
-              <h3>Cooking Up Some Delicious Plans!</h3>
-              <p>
-                {
-                  "We're busy in the kitchen, whipping up some tasty meal plans "
-                }
-                {'just for you!'}
-              </p>
-              <p>{'Stay tuned for our culinary creations coming soon!'}</p>
-            </div>
-          </div>
-          <button
-            className='home__view-more'
-            onClick={() => handleViewMore(title)}
-          >
-            Get Updates!
-          </button>
-        </section>
-      );
-    }
-
-    return (
-      <section className='home__section'>
-        <h1 className='home__section-title'>{title}</h1>
-        <div className='home__grid'>
-          {items.slice(0, limit).map((product) => (
-            <Card
-              key={product._id}
-              name={product.name}
-              product={product}
-              isFeatured={product.isFeatured}
-              isAdmin={false}
-              onAddToCart={() => handleAddToCart(product)}
-              onBuyNow={() =>
-                openBuyModal(modalState.product, modalState.quantity)
-              }
-              onFavorite={toggleFavorite}
-              onClick={() => openPreview(product)}
-              showQuantity={false}
-              initialQuantity={1}
-            />
-          ))}
         </div>
         <button
           className='home__view-more'
@@ -286,75 +142,118 @@ const Home = () => {
     );
   };
 
-  const renderCartSection = () => {
-    if (error) {
-      return <p>Error: {error}</p>;
-    }
+  const renderFeaturedSection = () => {
+    return renderProductGrid(featuredProducts, 'Featured Items');
+  };
 
-    if (!cartItems || cartItems.length === 0) {
-      return <p className='home__cart-empty'>Your cart is empty.</p>;
+  const renderFavoritesSection = () => {
+    return renderProductGrid(favorites, 'Favorite Items');
+  };
+
+  const renderOrdersSection = () => {
+    if (!orders || orders.length === 0) {
+      return <p className='home__empty-message'>You have no orders.</p>;
     }
 
     return (
       <section className='home__section'>
-        <div className='home__section-title'>My Cart</div>
+        <h1 className='home__title'>My Orders</h1>
         <div className='home__grid'>
-          {cartItems.map((item) => (
-            <Card
-              key={item.product?._id}
-              product={item.product}
-              isFeatured={false}
-              isAdmin={false}
-              onAddToCart={() => handleAddToCart(item.product)}
-              onBuyNow={() => handleBuyNow(item.product)}
-              onFavorite={toggleFavorite}
-              onClick={() => openPreview(item.product)}
-              initialQuantity={item.quantity}
-            />
-          ))}
+          {orders.slice(0, 4).map((order) => {
+            const product = order.item[0];
+            return (
+              <Card
+                key={order._id}
+                product={{ ...product, price: product.price || order.price }}
+                isFeatured={product.isFeatured}
+                onAddToCart={() => handleAddToCart(product)}
+                onBuyNow={() => handleShowBuyModal(product)}
+                onFavorite={toggleFavorite}
+                onClick={() => handleShowPreview(product)}
+              />
+            );
+          })}
         </div>
         <button
           className='home__view-more'
-          onClick={() => handleViewMore('My cart')}
+          onClick={() => handleViewMore('orders')}
         >
           View More
         </button>
       </section>
     );
   };
+
+  const renderCartSection = () => {
+    if (!cartItems || !Array.isArray(cartItems) || cartItems.length === 0) {
+      return <p className='home__empty-message'>Your cart is empty.</p>;
+    }
+
+    return (
+      <section className='home__section'>
+        <h1 className='home__title'>My Cart</h1>
+        <div className='home__grid'>
+          {cartItems.map((item) => (
+            <Card
+              isFeatured={item.product.isFeatured}
+              key={item.product?._id}
+              product={item.product || item.name}
+              onAddToCart={() => handleAddToCart(item.product)}
+              onBuyNow={() => handleShowBuyModal(item.product)}
+              onFavorite={toggleFavorite}
+              onClick={() => handleShowPreview(item.product)}
+              initialQuantity={item.quantity}
+            />
+          ))}
+        </div>
+        <button
+          className='home__view-more'
+          onClick={() => handleViewMore('cart')}
+        >
+          View More
+        </button>
+      </section>
+    );
+  };
+
   return (
     <div
-      className={`home__container ${isLoggedIn ? 'home__container--dashboard' : 'home__container--no-dashboard'}`}
+      className={`home ${isLoggedIn ? 'home--dashboard' : 'home--no-dashboard'}`}
     >
       <PreviewOverlay
-        isOpen={modalState.type === 'preview'}
+        isOpen={modalStates.showPreview}
         onClose={closeModal}
-        product={modalState.product}
-        quantity={modalState.quantity}
-        isFeatured={modalState.product?.isFeatured}
-        isLiked={favorites.some((fav) => fav._id === modalState.product?._id)}
-        onQuantityChange={(newQuantity) =>
-          setModalState((prev) => ({ ...prev, quantity: newQuantity }))
-        }
-        onAddToCart={() => handleAddToCart(modalState.product)}
-        onBuyNow={() => openBuyModal(modalState.product, modalState.quantity)}
+        product={modalStates.previewProduct}
+        quantity={previewQuantity}
+        isLiked={favorites.some(
+          (fav) => fav._id === modalStates.previewProduct?._id,
+        )}
+        onQuantityChange={(newQuantity) => setPreviewQuantity(newQuantity)}
+        onAddToCart={() => handleAddToCart(modalStates.previewProduct)}
+        onBuyNow={() => handleShowBuyModal(modalStates.previewProduct)}
         onFavorite={toggleFavorite}
       />
-      <BuyModal
-        isOpen={modalState.type === 'buy'}
-        onClose={closeModal}
-        product={modalState.product}
-        quantity={modalState.quantity}
-        onPurchase={async () => {
-          handleBuyNow(modalState.product);
-        }}
-      />
-      {renderProductGrid(featuredProducts, 'Featured Products')}
-      {renderProductGrid(products, 'Products')}
-      {renderProductGrid(favorites, 'Favorites')}
-      {renderCartSection(cartItems, 'Cart')}
-      {renderProductGrid(mealPlans, 'Meal Plans')}
-      {renderOrdersSection(orders, 'Orders')}
+
+      {modalStates.showBuyModal && (
+        <BuyModal
+          isOpen={modalStates.showBuyModal}
+          onClose={closeModal}
+          quantity={previewQuantity}
+          product={modalStates.productToBuy}
+          onPurchase={handlePurchase}
+        />
+      )}
+
+      {renderFeaturedSection()}
+      {renderProductGrid(items, 'Products')}
+
+      {isLoggedIn && (
+        <>
+          {renderOrdersSection()}
+          {renderCartSection()}
+          {renderFavoritesSection()}
+        </>
+      )}
     </div>
   );
 };

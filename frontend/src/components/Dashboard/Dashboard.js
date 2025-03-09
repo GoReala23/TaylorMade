@@ -1,31 +1,37 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { CartContext } from '../../context/CartContext';
 import './Dashboard.css';
 
-const Dashboard = () => {
+const Dashboard = ({ orders, fetchOrders }) => {
   const [isLeftSide, setIsLeftSide] = useState(false);
   const { currentUser } = useContext(AuthContext);
+  const { cartItems, fetchCart } = useContext(CartContext);
+  useEffect(() => {
+    fetchOrders();
+    fetchCart();
+  }, []);
 
-  // const togglePosition = () => {
-  //   setIsLeftSide(!isLeftSide);
-  //   document.body.classList.toggle('dashboard__left');
-  // };
+  const togglePosition = () => {
+    setIsLeftSide(!isLeftSide);
+    document.body.classList.toggle('dashboard__left', isLeftSide);
+  };
 
   return (
     <div
-      className={`dashboard ${isLeftSide ? 'dashboard__left' : ''} ${!isLeftSide ? 'dashboard__right' : ''}`}
+      className={`dashboard ${isLeftSide ? 'dashboard__left' : 'dashboard__top'}`}
     >
       <nav className='dashboard__nav'>
         <ul className='dashboard__nav-list'>
           <li className='dashboard__nav-item'>
             <Link to='/orders' className='dashboard__nav-link'>
-              Orders
+              Orders ({orders.length})
             </Link>
           </li>
           <li className='dashboard__nav-item'>
             <Link to='/cart' className='dashboard__nav-link'>
-              Cart
+              Cart ({cartItems.length})
             </Link>
           </li>
           <li className='dashboard__nav-item'>
@@ -42,7 +48,7 @@ const Dashboard = () => {
           )}
         </ul>
       </nav>
-      <button className='dashboard__toggle'>
+      <button className='dashboard__toggle' onClick={togglePosition}>
         {isLeftSide ? 'Move to Top' : 'Move to Left'}
       </button>
     </div>

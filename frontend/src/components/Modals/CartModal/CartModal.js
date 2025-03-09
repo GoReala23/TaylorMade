@@ -4,6 +4,7 @@ import { CartContext } from '../../../context/CartContext';
 import './CartModal.css';
 import BuyModal from '../BuyModal/BuyModal';
 import Card from '../../Card/Card';
+import { AuthContext } from '../../../context/AuthContext';
 
 const CartModal = ({ isOpen = true, onClose }) => {
   const {
@@ -18,8 +19,10 @@ const CartModal = ({ isOpen = true, onClose }) => {
     getSavedItems,
     fetchCart,
   } = useContext(CartContext);
+  const { isLoggedIn } = useContext(AuthContext);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [productToBuy, setProductToBuy] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -32,11 +35,34 @@ const CartModal = ({ isOpen = true, onClose }) => {
     fetchData();
   }, []);
 
-  useEffect(() => {}, [cartItems, savedItems]);
-
   const handleBuyNow = async (product) => {
+    if (!product) return;
     setProductToBuy(product);
     setShowBuyModal(true);
+  };
+
+  const handlePurchase = async () => {
+    if (isSubmitting) return;
+    setIsSubmitting(true);
+
+    try {
+      if (!productToBuy || !productToBuy._id) {
+        throw new Error('Invalid product data');
+      }
+
+      if (productToBuy.isSaved) {
+        await removeSavedItem(productToBuy._id);
+      } else {
+        await removeFromCart(productToBuy._id);
+      }
+      setShowBuyModal(false);
+      alert('Order placed successfully!');
+    } catch (error) {
+      console.error('Error processing purchase:', error);
+      alert('Failed to process purchase. Please try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const renderCartItems = () => {
@@ -113,7 +139,9 @@ const CartModal = ({ isOpen = true, onClose }) => {
   const isBothSectionsEmpty = cartItems.length === 0 && savedItems.length === 0;
 
   return (
-    <div className='cart__modal'>
+    <div
+      className={`cart__modal ${isLoggedIn ? 'cart__modal--dashboard' : 'cart__modal--no-dashboard'}`}
+    >
       <div className='cart__modal-content'>
         <button className='cart__modal-close' onClick={onClose}>
           &times;
@@ -122,7 +150,10 @@ const CartModal = ({ isOpen = true, onClose }) => {
           <FaShoppingCart /> Your Cart ({cartItems.length} items)
         </h2>
         {isBothSectionsEmpty ? (
-          <p>Your cart is empty.</p>
+          <div className='cart__modal-empty'>
+            {' '}
+            <p>Your cart is empty.</p>
+          </div>
         ) : (
           <>
             <section className='cart__modal-section'>
@@ -144,6 +175,7 @@ const CartModal = ({ isOpen = true, onClose }) => {
             onClose={() => setShowBuyModal(false)}
             product={productToBuy}
             quantity={productToBuy.quantity || 1}
+            onPurchase={handlePurchase}
           />
         )}
       </div>

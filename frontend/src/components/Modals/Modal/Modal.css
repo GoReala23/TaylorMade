@@ -63,18 +63,18 @@
 /* Media Queries */
 
 /* Small Screen View */
-@screen media and (width <= 425px) {
+@media screen and (max-width: 319px) {
   .modal__content {
     max-width: 95%;
   }
 }
 
 /* Mobile View */
-@media screen and (width > 42px) and (width <=768px) {
+/* @media screen and( min-width: 320px) and (max-width: 680px) {
   .modal__content {
     max-width: 90%;
   }
-}
+} */
 
 /* Tablet View */
 

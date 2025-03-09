@@ -10,7 +10,7 @@ const auth = async (req, res, next) => {
     if (!authHeader) {
       throw new Error('Authorization header missing');
     }
-    const token = req.header('Authorization')?.replace('Bearer ', '');
+    const token = req.header('Authorization')?.replace('Bearer ', '').trim();
     console.log('Token:', token); // Debug log
     if (!token) {
       throw new UnauthorizedError('No authentication token');

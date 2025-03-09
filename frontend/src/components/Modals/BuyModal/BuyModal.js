@@ -10,6 +10,7 @@ const BuyModal = ({
   product,
   quantity,
   onSwitchToRegister,
+  onPurchase,
 }) => {
   const { values, handleChange, errors, isValid } = useFormAndValidation();
 
@@ -21,8 +22,15 @@ const BuyModal = ({
 
     try {
       const token = localStorage.getItem('token');
-      await Api.createOrder(product._id, quantity, values.address, token);
 
+      if (!product || !product._id) throw new Error('Invalid product data');
+      await Api.createOrder(
+        product._id || product.id,
+        quantity,
+        values.address,
+        token,
+      );
+      onPurchase();
       onClose();
       alert('Order placed successfully!');
     } catch (error) {

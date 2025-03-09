@@ -40,7 +40,12 @@ const PreviewOverlay = ({
   };
 
   const handleBuyNow = () => {
-    onBuyNow(formattedProduct);
+    if (typeof onBuyNow === 'function') {
+      onClose();
+      onBuyNow(formattedProduct);
+    } else {
+      console.error('onBuyNow is not a function');
+    }
   };
 
   return (
@@ -71,26 +76,32 @@ const PreviewOverlay = ({
             />
           </div>
         </div>
-        <h3 className='preview__title'>{formattedProduct.name}</h3>
-        <p className='preview__description'>{formattedProduct.description}</p>
-        <p className='preview__price'>${formattedProduct.price}</p>
-        <div className='preview__quantity-controls'>
-          <button onClick={() => onQuantityChange(Math.max(1, quantity - 1))}>
-            -
-          </button>
-          <span>{quantity}</span>
-          <button onClick={() => onQuantityChange(quantity + 1)}>+</button>
-        </div>
-        <p className='card__price-per-quantity'>
-          Total: ${(product.price * quantity).toFixed(2)}
-        </p>
-        <div className='preview__actions'>
-          <button onClick={handleAddToCart} className='preview__button'>
-            Add to Cart
-          </button>
-          <button onClick={handleBuyNow} className='preview__button'>
-            Buy Now
-          </button>
+        <div className='preview__content'>
+          <h3 className='preview__title'>{formattedProduct.name}</h3>
+          <p className='preview__description'>{formattedProduct.description}</p>
+          <div className='preview__price-container'>
+            <p className='preview__price'>${formattedProduct.price}</p>
+            <div className='preview__quantity-controls'>
+              <button
+                onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
+              >
+                -
+              </button>
+              <span>{quantity}</span>
+              <button onClick={() => onQuantityChange(quantity + 1)}>+</button>
+            </div>
+            <p className='card__price-per-quantity'>
+              Total: ${(product.price * quantity).toFixed(2)}
+            </p>
+          </div>
+          <div className='preview__actions'>
+            <button onClick={handleAddToCart} className='preview__button'>
+              Add to Cart
+            </button>
+            <button onClick={handleBuyNow} className='preview__button'>
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
     </div>

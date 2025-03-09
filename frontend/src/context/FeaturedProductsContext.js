@@ -1,33 +1,32 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useContext } from 'react';
+import { ProductsContext } from './ProductsContext';
 import Api from '../utils/Api';
 
-const FeaturedProductsContext = createContext();
+export const FeaturedProductsContext = createContext();
 
 export const FeaturedProductsProvider = ({ children }) => {
+  const { products, setProducts } = useContext(ProductsContext);
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
-  const fetchFeaturedProducts = async () => {
-    try {
-      const fetchedProducts = featuredProducts.find(
-        (category) => category.category === 'Featured',
-      );
-      if (fetchedProducts) {
-        console.log(fetchedProducts);
-        setFeaturedProducts(fetchedProducts.items);
-      }
-    } catch (error) {
-      console.error('Error fetching featured products:', error);
-    }
-  };
-
   useEffect(() => {
-    fetchFeaturedProducts();
-  }, []);
+    const productsFeatured = () => {
+      const featured = products.filter((product) => product.isFeatured);
+      setFeaturedProducts(featured);
+    };
+
+    productsFeatured();
+  }, [products]);
 
   const toggleFeatured = async (productId) => {
     try {
       await Api.toggleFeaturedProduct(productId);
-      fetchFeaturedProducts();
+      setProducts((prevProducts) =>
+        prevProducts.map((product) =>
+          product.id === productId
+            ? { ...product, isFeatured: !product.isFeatured }
+            : product,
+        ),
+      );
     } catch (error) {
       console.error('Error toggling featured product:', error);
     }

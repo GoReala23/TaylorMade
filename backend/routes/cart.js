@@ -20,7 +20,7 @@ router.get('/', getCart);
 router.post('/add', addItemToCart);
 router.delete('/remove/:productId', removeItemFromCart);
 router.patch('/update', updateCartItemQuantity);
-router.patch('/saved/update', auth, updateSavedItemQuantity);
+router.patch('/saved/update/:productId', auth, updateSavedItemQuantity);
 router.get('/saved', getSavedItems);
 
 router.post('/save-for-later/:productId', auth, saveForLater);

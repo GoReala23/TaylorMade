@@ -3,6 +3,15 @@ const Item = require('../models/item');
 const User = require('../models/user');
 const Product = require('../models/item');
 
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+  NotFoundError,
+  ServerError,
+} = require('../errors/errors');
+const { default: mongoose, get } = require('mongoose');
+
 // Add item to cart
 const addItemToCart = async (req, res, next) => {
   const { productId, quantity } = req.body;
@@ -10,7 +19,7 @@ const addItemToCart = async (req, res, next) => {
 
   try {
     if (!productId) {
-      return res.status(400).json({ message: 'Product ID is required' });
+      return next(new BadRequestError('Product ID is required'));
     }
 
     let cart = await Cart.findOne({ user: userId });
@@ -33,7 +42,7 @@ const addItemToCart = async (req, res, next) => {
     console.log(`Cart updated successfully for user: ${userId}: ${productId}`);
     res.status(200).json(cart);
   } catch (error) {
-    next(error);
+    next(new ServerError('An error occurred while adding item to cart'));
   }
 };
 // Remove item from cart
@@ -43,7 +52,7 @@ const removeItemFromCart = async (req, res, next) => {
 
   try {
     const cart = await Cart.findOne({ user: userId });
-    if (!cart) return res.status(404).json({ message: 'Cart not found' });
+    if (!cart) return next(new NotFoundError('Cart not found'));
 
     cart.items = cart.items.filter(
       (item) => item.product.toString() !== productId
@@ -52,56 +61,82 @@ const removeItemFromCart = async (req, res, next) => {
     await cart.save();
     res.status(200).json(cart);
   } catch (error) {
-    next(error);
+    next(new ServerError('An error occurred while removing item from cart'));
   }
 };
 
 // Update item quantity in cart
+const updateCartItemQuantity = async (req, res, next) => {
+  const { productId, newQuantity } = req.body;
+  console.log('productId:', productId);
 
-const updateCartItemQuantity = async (productId, newQuantity) => {
+  const userId = req.user.userId;
+
   try {
-    const token = localStorage.getItem('token');
-    const response = await Api.updateCartQuantity(
-      productId,
-      newQuantity,
-      token
-    );
-    if (response && response.cart) {
-      setCartItems((prev) =>
-        prev.map((item) =>
-          item.product._id === productId
-            ? { ...item, quantity: newQuantity }
-            : item
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return next(
+        new BadRequestError(
+          'Invalid product ID format. Please check the product ID'
         )
       );
     }
-  } catch (error) {
-    console.error('Error updating cart quantity:', error);
-  }
-};
-// Update saved item quantity
-const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await Api.updateSavedItemQuantity(
-      savedItemId,
-      newQuantity,
-      token
+
+    const cart = await Cart.findOne({ user: userId });
+    if (!cart) return next(new NotFoundError('Cart not found'));
+
+    const cartItem = cart.items.find(
+      (item) => item.product.toString() === productId
     );
-    if (response && response.savedItems) {
-      setSavedItems(response.savedItems);
-    }
+    if (!cartItem) return next(new NotFoundError('Item not found in cart'));
+
+    cartItem.quantity = newQuantity;
+
+    await cart.save();
+    res.status(200).json(cart);
   } catch (error) {
-    console.error('Error updating saved item quantity:', error);
+    next(
+      new ServerError('An error occurred while updating cart item quantity')
+    );
   }
 };
+
+// Update saved item quantity
+const updateSavedItemQuantity = async (req, res, next) => {
+  const { productId } = req.params;
+  const { newQuantity } = req.body;
+  const userId = req.user.userId;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return next(new BadRequestError('Invalid product ID format'));
+    }
+
+    const user = await User.findById(userId);
+    if (!user) return next(new NotFoundError('User not found'));
+
+    const savedItem = user.savedItems.find(
+      (item) => item.product.toString() === productId
+    );
+    if (!savedItem) return next(new NotFoundError('Saved item not found'));
+
+    savedItem.quantity = newQuantity;
+
+    await user.save();
+    res.status(200).json(user);
+  } catch (error) {
+    next(
+      new ServerError('An error occurred while updating saved item quantity')
+    );
+  }
+};
+
 // Get cart contents
 const getCart = async (req, res, next) => {
   try {
     const userId = req.user.userId;
 
     if (!userId) {
-      return res.status(401).json({ message: 'User not authenticated' });
+      return next(new UnauthorizedError('User not authenticated'));
     }
 
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
@@ -116,7 +151,9 @@ const getCart = async (req, res, next) => {
     res.status(200).json(cart);
   } catch (error) {
     console.error('Error fetching or creating cart:', error);
-    next(error);
+    next(
+      new ServerError('An error occurred while fetching or creating the cart')
+    );
   }
 };
 const moveToCart = async (req, res, next) => {
@@ -126,14 +163,14 @@ const moveToCart = async (req, res, next) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new NotFoundError('User not found'));
     }
 
     const savedItem = user.savedItems.find(
       (item) => item.product && item.product.toString() === productId
     );
     if (!savedItem) {
-      return res.status(404).json({ message: 'Saved item not found' });
+      return next(new NotFoundError('Saved item not found'));
     }
 
     let cart = await Cart.findOne({ user: userId });
@@ -161,9 +198,8 @@ const moveToCart = async (req, res, next) => {
     await cart.populate('items.product');
     res.status(200).json({ message: 'Item moved to cart', cart });
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: 'Error moving item to cart', error: error.message });
+    res;
+    next(new ServerError('An error occurred while moving saved item to cart'));
   }
 };
 const removeSaved = async (req, res, next) => {
@@ -173,19 +209,18 @@ const removeSaved = async (req, res, next) => {
   try {
     const user = await User.findById(userId);
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new NotFoundError('User not found'));
     }
-    console.log('Before removal:', user.savedItems);
 
     user.savedItems = user.savedItems.filter(
       (item) => item.product && item.product.toString() !== productId
     );
-    console.log('After removal:', user.savedItems);
+
     await user.save();
     res.status(200).json({ message: 'Saved item removed successfully' });
   } catch (error) {
     console.error('Error removing saved item:', error);
-    next(error);
+    next(new ServerError('An error occurred while removing saved item'));
   }
 };
 const getSavedItems = async (req, res, next) => {
@@ -193,11 +228,11 @@ const getSavedItems = async (req, res, next) => {
   try {
     const user = await User.findById(userId).populate('savedItems.product');
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new NotFoundError('User not found'));
     }
     res.status(200).json(user.savedItems);
   } catch (error) {
-    next(error);
+    next(new ServerError('An error occurred while fetching saved items'));
   }
 };
 const saveForLater = async (req, res, next) => {
@@ -208,7 +243,7 @@ const saveForLater = async (req, res, next) => {
     const user = await User.findById(userId);
 
     if (!user) {
-      return res.status(404).json({ message: 'User not found' });
+      return next(new NotFoundError('User not found'));
     }
 
     const cartItem = cart.items.find(
@@ -231,7 +266,8 @@ const saveForLater = async (req, res, next) => {
       .status(200)
       .json({ message: 'Item saved for later', savedItems: user.savedItems });
   } catch (error) {
-    next(error);
+    next(new ServerError('An error occurred while saving for later'));
+    ac;
   }
 };
 
@@ -246,3 +282,43 @@ module.exports = {
   getCart,
   getSavedItems,
 };
+
+// Update item quantity in cart
+
+// const updateCartItemQuantity = async (productId, newQuantity) => {
+//   try {
+//     const token = localStorage.getItem('token');
+//     const response = await Api.updateCartQuantity(
+//       productId,
+//       newQuantity,
+//       token
+//     );
+//     if (response && response.cart) {
+//       setCartItems((prev) =>
+//         prev.map((item) =>
+//           item.product._id === productId
+//             ? { ...item, quantity: newQuantity }
+//             : item
+//         )
+//       );
+//     }
+//   } catch (error) {
+//     console.error('Error updating cart quantity:', error);
+//   }
+// };
+// Update saved item quantity
+// const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
+//   try {
+//     const token = localStorage.getItem('token');
+//     const response = await Api.updateSavedItemQuantity(
+//       savedItemId,
+//       newQuantity,
+//       token
+//     );
+//     if (response && response.savedItems) {
+//       setSavedItems(response.savedItems);
+//     }
+//   } catch (error) {
+//     console.error('Error updating saved item quantity:', error);
+//   }
+// };

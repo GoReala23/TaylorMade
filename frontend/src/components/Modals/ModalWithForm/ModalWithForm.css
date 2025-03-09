@@ -163,12 +163,12 @@
 
 /* Mobile View */
 
-@media screen and (width < 425px) {
+@media screen and (max-width: 319px) {
   .modal__content {
-    max-width: 85%;
+    max-width: 90%;
     box-shadow: none;
-    height: 50%;
-    max-height: 100%;
+    height: 75%;
+    max-height: 80%;
   }
 
   .modal__title {
@@ -176,36 +176,30 @@
   }
 
   .modal__form {
-    max-height: 80vh;
     max-width: 80%;
+
+    gap: 0.5vh;
+  }
+  .modal__close {
+    top: 0;
+    right: 0;
   }
 }
 
-/* Mobile View Larger */
-
-@media screen and (width >= 425px) and (width < 768px) {
-  .modal__content {
-    max-width: 75%;
-    height: auto;
-    max-height: 75%;
-    box-shadow: none;
-  }
-
-  .modal__title {
-    font-size: 2.8rem;
-  }
-}
-
-/*Tablet View */
-
-@media screen and (width >= 768px) {
+@media screen and (min-width: 320px) and (max-width: 679px) {
   .modal__content {
     display: flex;
     flex-direction: column;
-    min-width: 50%;
-    width: auto;
+    max-height: 90%;
+    font-size: 70%;
+    width: 90%;
     box-shadow: none;
     height: auto;
+  }
+
+  .modal__form {
+    gap: 0.5vh;
+    max-width: 100%;
   }
 
   .modal__close {
@@ -213,9 +207,9 @@
     right: 0;
   }
 
-  .modal__title {
-    font-size: 1.5rem;
-  }
+  /* .modal__title {
+    font-size: 50%;
+  } */
 
   .modal__form {
     width: 100%;
@@ -223,12 +217,10 @@
   }
 }
 
-/* Desktop View */
-
-@media screen and (width >= 1024px) {
+@media screen and (min-width: 680px) and (max-width: 1023px) {
   .modal__content {
-    width: 50vw;
-    height: 50vh;
+    width: 80;
+    max-height: 50%;
     display: flex;
     flex-direction: column;
     box-shadow: none;
@@ -246,5 +238,34 @@
     font-size: 1.5rem;
     align-self: flex-start;
     padding-left: 2vh;
+    align-self: center;
+  }
+}
+
+/* Desktop View */
+
+@media screen and (min-width: 1024px) {
+  .modal__content {
+    width: 80;
+    height: auto;
+    display: flex;
+
+    flex-direction: column;
+    box-shadow: none;
+    max-width: 400px;
+    font-size: 1rem;
+    /* align-items: flex-start; */
+  }
+
+  .modal__form {
+    width: 50vw;
+    height: 50vh;
+  }
+
+  .modal__title {
+    font-size: 1.5rem;
+    align-self: flex-start;
+    padding-left: 2vh;
+    align-self: center;
   }
 }

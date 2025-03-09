@@ -3,6 +3,14 @@ const Item = require('../models/item');
 const fetch = require('node-fetch');
 const Like = require('../models/likes');
 
+const {
+  BadRequestError,
+  ConflictError,
+  UnauthorizedError,
+  NotFoundError,
+  ServerError,
+} = require('../errors/errors');
+
 const THIRD_PARTY_API_URL = 'https://fakestoreapi.com/products';
 
 // Function to fetch products from the third-party API
@@ -86,7 +94,7 @@ const mapCategories = (item) => {
 };
 
 // get all items
-const getItems = async (req, res) => {
+const getItems = async (req, res, next) => {
   try {
     // Get local database items
     const dbItems = await Item.find({});
@@ -97,7 +105,9 @@ const getItems = async (req, res) => {
       fakeStoreItems = await fetchThirdPartyProducts();
       console.log('fakeStoreItems:', fakeStoreItems);
     } catch (error) {
-      console.error('Failed to fetch fake store items:', error);
+      next(
+        new ServerError('An error occurred while fetching third-party products')
+      );
     }
 
     // Filter food products
@@ -195,19 +205,19 @@ async function createItem(req, res) {
 
 // Get an item by ID
 
-const getItemById = async (req, res) => {
+const getItemById = async (req, res, next) => {
   try {
     const item = await Item.findById(req.params.id);
     if (!item) {
-      return res.status(404).json({ message: 'Item not found' });
+      return next(new NotFoundError('Item not found'));
     }
     res.json(item);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while fetching the item'));
   }
 };
 
-const updateItem = async (req, res) => {
+const updateItem = async (req, res, next) => {
   const { name, price, description, imageUrl, categories } = req.body;
 
   try {
@@ -218,69 +228,70 @@ const updateItem = async (req, res) => {
     );
 
     if (!updatedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+      return next(new NotFoundError('Item not found'));
     }
     res.json(updatedItem);
   } catch (err) {
-    res.status.json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while updating the item'));
   }
 };
 
 // Delete an item by ID
-const deleteItem = async (req, res) => {
+const deleteItem = async (req, res, next) => {
   try {
     const deletedItem = await Item.findByIdAndDelete(req.params.id);
     if (!deletedItem) {
-      return res.status(404).json({ message: 'Item not found' });
+      return next(new NotFoundError('Item not found'));
     }
     res.json({ message: 'Item deleted' });
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while deleting the item'));
   }
 };
 
-const likeItem = async (req, res) => {
+const likeItem = async (req, res, next) => {
   const { itemId } = req.params;
   const userId = req.user ? req.user.id : null;
 
   try {
     if (!itemId || !userId) {
-      return res
-        .status(400)
-        .json({ message: 'Item ID and User ID are required' });
+      return next(new BadRequestError('Item ID and User ID are required'));
     }
 
     const existingLike = await Like.findOne({ user: userId, item: itemId });
     if (existingLike) {
-      return res.status(400).json({ message: 'Item already liked' });
+      return next(new ConflictError('Item already liked'));
     }
 
     const like = new Like({ user: userId, item: itemId });
     await like.save();
     res.status(201).json(like);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while liking the item'));
   }
 };
-const toggleFeatured = async (req, res) => {
+const toggleFeatured = async (req, res, next) => {
   try {
     const item = await Item.findById(req.params.id);
-    if (!item) return res.status(404).json({ message: 'Item not found' });
+    if (!item) return next(new NotFoundError('Item not found'));
 
     item.isFeatured = !item.isFeatured;
     await item.save();
     res.json(item);
   } catch (error) {
-    res.status(500).json({ message: 'Error toggling featured status', error });
+    next(new ServerError('An error occurred while toggling featured status'));
   }
 };
 // Bulk create items for emergency product additions
-const getFeaturedProducts = async (req, res) => {
+const getFeaturedProducts = async (req, res, next) => {
   try {
     const items = getItems().find({ isFeatured: true });
+    if (!items) {
+      return next(new NotFoundError('Featured items not found'));
+    }
     res.json(items);
   } catch (err) {
-    res.status(500).json({ message: 'Server error', error: err.message });
+    next(new ServerError('An error occurred while fetching featured items'));
   }
 };
 
