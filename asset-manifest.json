@@ -1,8 +1,8 @@
 {
   "files": {
-    "main.css": "/TaylorMade/static/css/main.e70f98cb.css",
-    "main.js": "/TaylorMade/static/js/main.bcaaf921.js",
-    "static/js/453.8ab44547.chunk.js": "/TaylorMade/static/js/453.8ab44547.chunk.js",
+    "main.css": "/TaylorMade/static/css/main.aa504df6.css",
+    "main.js": "/TaylorMade/static/js/main.c5fbbc44.js",
+    "static/js/453.d855a71b.chunk.js": "/TaylorMade/static/js/453.d855a71b.chunk.js",
     "static/media/Taylor-Made_Title.webp": "/TaylorMade/static/media/Taylor-Made_Title.26ef1c5ad02203c5d035.webp",
     "static/media/TM_landing-background.png": "/TaylorMade/static/media/TM_landing-background.c1c270ee2dd3210b03ec.png",
     "static/media/home__page-bkgrd.webp": "/TaylorMade/static/media/home__page-bkgrd.80e5f826ffa6efd34c3a.webp",
@@ -11,12 +11,12 @@
     "static/media/plate_left-register.jpg": "/TaylorMade/static/media/plate_left-register.c810af9b459da6c48e02.jpg",
     "static/media/plate_right-log.jpg": "/TaylorMade/static/media/plate_right-log.62845c006ee2a1fdf0c0.jpg",
     "index.html": "/TaylorMade/index.html",
-    "main.e70f98cb.css.map": "/TaylorMade/static/css/main.e70f98cb.css.map",
-    "main.bcaaf921.js.map": "/TaylorMade/static/js/main.bcaaf921.js.map",
-    "453.8ab44547.chunk.js.map": "/TaylorMade/static/js/453.8ab44547.chunk.js.map"
+    "main.aa504df6.css.map": "/TaylorMade/static/css/main.aa504df6.css.map",
+    "main.c5fbbc44.js.map": "/TaylorMade/static/js/main.c5fbbc44.js.map",
+    "453.d855a71b.chunk.js.map": "/TaylorMade/static/js/453.d855a71b.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.e70f98cb.css",
-    "static/js/main.bcaaf921.js"
+    "static/css/main.aa504df6.css",
+    "static/js/main.c5fbbc44.js"
   ]
 }
