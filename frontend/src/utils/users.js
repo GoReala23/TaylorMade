@@ -7,13 +7,13 @@ const users = [
   },
   {
     name: 'User',
-    email: 'testEmail',
+    email: 'testEmail@test.com',
     password: 'Password123',
     isAdmin: false,
   },
   {
     name: 'User 2',
-    email: 'regUser2@example.com',
+    email: 'newuser1@example.com',
     password: 'Password123',
     isAdmin: false,
   },

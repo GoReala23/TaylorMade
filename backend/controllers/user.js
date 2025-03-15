@@ -51,8 +51,8 @@ const verifyTwoFactor = async (req, res) => {
       return res.status(400).json({ message: '2FA not set up' });
     }
 
-    console.log('User Secret:', user.twoFactorSecret);
-    console.log('Provided Token:', token);
+    // console.log('User Secret:', user.twoFactorSecret);
+    // console.log('Provided Token:', token);
 
     const verified = speakeasy.totp.verify({
       secret: user.twoFactorSecret,
@@ -232,7 +232,7 @@ const getCurrentUser = async (req, res, next) => {
 };
 const getAllUsers = async (req, res, next) => {
   let User = req.user.token;
-  console.log(User);
+  // console.log(User);
 
   if (!req.user || !req.user.isAdmin) {
     return next(new UnauthorizedError('Admin access required'));

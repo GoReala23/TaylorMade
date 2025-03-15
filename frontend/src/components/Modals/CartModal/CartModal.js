@@ -25,15 +25,17 @@ const CartModal = ({ isOpen = true, onClose }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('token');
-      if (token) {
-        await fetchCart();
-        await getSavedItems();
-      }
-    };
-    fetchData();
-  }, []);
+    if (isOpen) {
+      const fetchData = async () => {
+        const token = localStorage.getItem('token');
+        if (token) {
+          await fetchCart();
+          await getSavedItems();
+        }
+      };
+      fetchData();
+    }
+  }, [isOpen]);
 
   const handleBuyNow = async (product) => {
     if (!product) return;

@@ -1,0 +1,26 @@
+.locations__page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  height: 100%;
+  width: 100vw;
+  text-align: center;
+  background: rgba(246, 224, 158, 0.95);
+  color: #8b4513;
+}
+
+.locations__title {
+  font-size: 2.5rem;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.locations__coming-soon {
+  font-size: 4.5rem;
+  font-weight: bold;
+  color: #888;
+  text-align: center;
+  margin-top: 2rem;
+}

@@ -22,10 +22,11 @@ html {
   font-weight: 700;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  /* background-size: cover;
-  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
   display: flex;
-  flex-direction: column; */
+  flex-direction: column;
 }
 button {
   font-family: inherit;

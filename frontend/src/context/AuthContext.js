@@ -17,6 +17,8 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [authError, setAuthError] = useState(null);
+  const [successMessage, setSuccessMessage] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -41,7 +43,10 @@ export const AuthProvider = ({ children }) => {
     };
     initializeAuthState();
   }, []);
-
+  const clearMessages = () => {
+    setAuthError(null);
+    setSuccessMessage(null);
+  };
   const register = async (userData) => {
     try {
       const response = await Auth.register(
@@ -49,25 +54,37 @@ export const AuthProvider = ({ children }) => {
         userData.email,
         userData.password,
       );
+      setSuccessMessage('Registration successful! Please log in.');
+      setAuthError(null);
+      setTimeout(clearMessages, 3000);
       return response;
     } catch (error) {
       console.error('Registration error:', error);
+      setAuthError(error.message || 'Registration failed. Please try again.');
+      setSuccessMessage(null);
+      setTimeout(clearMessages, 3000);
       throw error;
     }
   };
-
   const login = async (userData) => {
     try {
+      setAuthError(null);
+      setSuccessMessage(null);
+
       const response = await Auth.login(userData.email, userData.password);
       localStorage.setItem('token', response.token);
       localStorage.setItem('isLoggedIn', true);
-      localStorage.setItem('user', JSON.stringify(response.user));
       setCurrentUser(response.user);
       setIsLoggedIn(true);
-      navigate('/dashboard');
+
+      setSuccessMessage('Login successful!');
+      setTimeout(() => setSuccessMessage(null), 3000);
     } catch (error) {
-      console.error('Login failed:', error);
-      alert('Login failed. Please check your credentials.');
+      setAuthError(
+        error.message && 'Login failed. Please check your credentials.',
+      );
+      setSuccessMessage(null);
+      setTimeout(() => setAuthError(null), 3000);
     }
   };
 
@@ -90,7 +107,16 @@ export const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider
-      value={{ currentUser, isLoggedIn, register, login, logout, isAdmin }}
+      value={{
+        currentUser,
+        isLoggedIn,
+        register,
+        login,
+        logout,
+        isAdmin,
+        authError,
+        successMessage,
+      }}
     >
       <CurrentUserContext.Provider value={currentUser}>
         {children}

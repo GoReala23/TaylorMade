@@ -39,7 +39,7 @@ const addItemToCart = async (req, res, next) => {
 
     await cart.save();
 
-    console.log(`Cart updated successfully for user: ${userId}: ${productId}`);
+    // console.log(`Cart updated successfully for user: ${userId}: ${productId}`);
     res.status(200).json(cart);
   } catch (error) {
     next(new ServerError('An error occurred while adding item to cart'));
@@ -141,7 +141,7 @@ const getCart = async (req, res, next) => {
 
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
 
-    console.log('Existing Cart data:', cart);
+    // console.log('Existing Cart data:', cart);
 
     if (!cart) {
       cart = await Cart.create({ user: userId, items: [] });
@@ -203,7 +203,7 @@ const moveToCart = async (req, res, next) => {
   }
 };
 const removeSaved = async (req, res, next) => {
-  console.log('Removing saved item:', req.params.productId);
+  // console.log('Removing saved item:', req.params.productId);
   const { productId } = req.params;
   const userId = req.user.userId;
   try {

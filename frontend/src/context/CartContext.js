@@ -15,16 +15,18 @@ export const CartProvider = ({ children }) => {
   const fetchCart = useCallback(async () => {
     try {
       const token = localStorage.getItem('token');
-
       if (!token) {
         console.log('No authentication token found');
         setCartItems([]);
         return;
       }
-      const response = await Api.getCart(token);
 
+      const response = await Api.getCart(token);
       if (response && response.items && Array.isArray(response.items)) {
-        setCartItems(response.items.filter((item) => item && item.product));
+        const validItems = response.items.filter(
+          (item) => item && item.product,
+        );
+        setCartItems(validItems);
       } else {
         setCartItems([]);
       }
@@ -32,7 +34,7 @@ export const CartProvider = ({ children }) => {
       console.error('Error fetching cart:', error);
       setCartItems([]);
     }
-  });
+  }, []);
   const getSavedItems = async () => {
     try {
       const token = localStorage.getItem('token');

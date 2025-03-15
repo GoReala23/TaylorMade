@@ -3,11 +3,12 @@
   background-size: contain;
   padding: 20px;
   min-height: 100vh;
-  width: 100%;
+  width: 100vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  color: #8b4513;
 }
 
 .products--dashboard {
@@ -26,6 +27,7 @@
 
 .products__category-bar {
   display: flex;
+  flex-wrap: wrap;
   justify-content: center;
   gap: 10px;
   margin-bottom: 5vh;
@@ -146,7 +148,7 @@
   }
 
   .products .header {
-    top: 15% !important;
+    /* top: 15% !important; */
   }
 
   .products--dashboard .header {
@@ -154,11 +156,11 @@
   }
 
   .products--dashboard {
-    margin-top: 41% !important;
+    /* margin-top: 41% !important; */
   }
 
   .products--no-dashboard {
-    margin-top: 21% !important;
+    /* margin-top: 21% !important; */
   }
 }
 
@@ -169,8 +171,14 @@
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .produccts--dashboard {
-    margin-top: 15% !important;
+  .products--dashboard {
+    /* margin-top: 15% !important; */
+    display: flex;
+    align-content: flex-start;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    flex-direction: column;
   }
 }
 
@@ -181,10 +189,10 @@
     grid-template-columns: repeat(3, 1fr);
   }
   .products--dashboard {
-    margin-top: 11.1% !important;
+    /* margin-top: 11.1% !important; */
   }
 
   .products--no-dashboard {
-    margin-top: 5.4% !important;
+    /* margin-top: 5.4% !important; */
   }
 }

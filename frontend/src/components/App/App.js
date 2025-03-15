@@ -13,12 +13,13 @@ import Profile from '../Profile/Profile';
 import Orders from '../Orders/Orders';
 import Settings from '../Settings/Settings';
 import About from '../About/About';
-// import Locations from '../Locations/Locations';
+import Locations from '../Locations/Locations';
 import LandingPage from '../LandingPage/LandingPage';
 import CartModal from '../Modals/CartModal/CartModal';
 import Footer from '../Footer/Footer';
 import Api from '../../utils/Api';
 import './App.css';
+import '../../fonts/fonts.css';
 import { formatProductData } from '../Card/Card';
 
 const App = ({ token }) => {
@@ -226,7 +227,9 @@ const App = ({ token }) => {
           fetchOrders={fetchOrders}
         />
       )}
-      <main className='App__content'>
+      <main
+        className={`App__content ${isLoggedIn ? 'App__content--dashboard' : 'App__content--no-dashboard'}`}
+      >
         <Routes>
           <Route
             path='/'
@@ -329,7 +332,7 @@ const App = ({ token }) => {
             element={isLoggedIn ? <CartModal /> : <Navigate to='/' />}
           />
           <Route path='/about' element={<About />} />
-          {/* <Route path='/locations' element={<Locations />} /> */}
+          <Route path='/locations' element={<Locations />} />
         </Routes>
         <Footer />
       </main>

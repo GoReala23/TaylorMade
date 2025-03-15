@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
 import useFormAndValidation from '../../../hooks/useFormAndValidation';
 import Api from '../../../utils/Api';
@@ -13,29 +13,43 @@ const BuyModal = ({
   onPurchase,
 }) => {
   const { values, handleChange, errors, isValid } = useFormAndValidation();
+  const [submitStatus, setSubmitStatus] = useState({ success: '', error: '' });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {}, [isOpen, product, quantity]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!isValid) return;
-
+    if (!isValid || isSubmitting) return;
+    setIsSubmitting(true);
+    setSubmitStatus({ success: '', error: '' });
     try {
       const token = localStorage.getItem('token');
-
-      if (!product || !product._id) throw new Error('Invalid product data');
+      if (!product || !product._id) {
+        throw new Error('Invalid product data');
+      }
+      if (!values.name || !values.email || !values.address) {
+        throw new Error('Please fill in all required fields');
+      }
       await Api.createOrder(
         product._id || product.id,
         quantity,
         values.address,
         token,
       );
-      onPurchase();
-      onClose();
-      alert('Order placed successfully!');
+      setSubmitStatus({ success: 'Order placed successfully!', error: '' });
+      setTimeout(() => {
+        onPurchase();
+        onClose();
+      }, 2000);
     } catch (error) {
       console.error('Error placing order:', error);
-      alert('Failed to place order. Please try again.');
+      setSubmitStatus({
+        success: '',
+        error: error.message || 'Failed to place order. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -46,10 +60,12 @@ const BuyModal = ({
         onClose={onClose}
         onSubmit={handleSubmit}
         title={`Buy ${product?.name || ''}`}
-        buttonText='Submit'
-        isSubmitDisabled={!isValid}
+        buttonText={isSubmitting ? 'Processing...' : 'Submit'}
+        isSubmitDisabled={!isValid || isSubmitting}
         formTabSwitch={onSwitchToRegister}
         switchText='Need to register?'
+        successMessage={submitStatus.success}
+        errorMessage={submitStatus.error}
       >
         <label className='buy__modal-form-label'>Name</label>
         <input

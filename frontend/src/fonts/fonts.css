@@ -1,0 +1,19 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Lobster&display=swap');
+
+:root {
+  --font-primary: 'Roboto', sans-serif;
+  --font-secondary: 'Lobster', cursive;
+}
+
+/* Apply global font styles */
+body,
+button {
+  font-family: var(--font-primary);
+}
+
+h1,
+h2,
+h3,
+p {
+  font-family: var(--font-secondary);
+}

@@ -16,8 +16,8 @@
   min-height: 100vh;
 }
 
-orders--dashboard {
-  margin-top: 0 !important;
+.orders--dashboard {
+  /* margin-top: 165px !important; */
 }
 .orders__container {
   display: flex;
@@ -149,13 +149,13 @@ orders--dashboard {
 
 @media screen and (min-width: 320px) and (max-width: 679px) {
   .orders--dashboard {
-    margin-top: 41% !important;
+    /* margin-top: 41% !important; */
   }
 }
 
 @media screen and (max-width: 680px) {
   .orders {
-    margin-top: 19vh;
+    /* margin-top: 19vh; */
   }
 
   .orders__list {
@@ -167,7 +167,7 @@ orders--dashboard {
 
 @media screen and (min-width: 681px) and (max-width: 1024px) {
   .orders {
-    margin-top: 21vh;
+    /* margin-top: 21vh; */
   }
 }
 
@@ -175,7 +175,7 @@ orders--dashboard {
 
 @media screen and (min-width: 1025px) {
   .orders {
-    margin-top: 15vh;
+    /* margin-top: 15vh; */
   }
 
   .orders--dashboard {
@@ -183,6 +183,6 @@ orders--dashboard {
   }
 
   .orders__container {
-    margin-top: 7.6vh;
+    /* margin-top: 7.6vh; */
   }
 }

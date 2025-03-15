@@ -1,8 +1,10 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import PropTypes from 'prop-types';
 import { FaHeart, FaStar } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../../context/CartContext';
+import { AuthContext } from '../../../context/AuthContext';
+import AuthModal from '../AuthModal/AuthModal';
 import { formatProductData } from '../../Card/Card';
 import './PreviewOverlay.css';
 
@@ -17,7 +19,9 @@ const PreviewOverlay = ({
   onFavorite,
   onBuyNow,
 }) => {
+  const { isLoggedIn } = useContext(AuthContext);
   const { addToCart } = useContext(CartContext);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const navigate = useNavigate();
 
   if (!isOpen || !product) return null;
@@ -95,12 +99,33 @@ const PreviewOverlay = ({
             </p>
           </div>
           <div className='preview__actions'>
-            <button onClick={handleAddToCart} className='preview__button'>
-              Add to Cart
-            </button>
-            <button onClick={handleBuyNow} className='preview__button'>
-              Buy Now
-            </button>
+            <div className='preview__actions'>
+              {!isLoggedIn ? (
+                <button
+                  onClick={() => setIsAuthModalOpen(true)}
+                  className='preview__button '
+                >
+                  Log-in to Purchase
+                </button>
+              ) : (
+                <>
+                  <button onClick={handleAddToCart} className='preview__button'>
+                    Add to Cart
+                  </button>
+                  <button onClick={handleBuyNow} className='preview__button'>
+                    Buy Now
+                  </button>
+                </>
+              )}
+              {isAuthModalOpen && (
+                <AuthModal
+                  isOpen={isAuthModalOpen}
+                  onClose={() => setIsAuthModalOpen(false)}
+                  onLogin={() => navigate('/login')}
+                  onRegister={() => navigate('/register')}
+                />
+              )}
+            </div>
           </div>
         </div>
       </div>

@@ -1,17 +1,42 @@
+import React, { useCallback, useContext, useState } from 'react';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
+import { AuthContext } from '../../../context/AuthContext';
 import useFormAndValidation from '../../../hooks/useFormAndValidation';
 
-const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToRegister }) => {
+const LoginModal = ({
+  isOpen,
+  onClose,
+  onLogin,
+  onSwitchToRegister,
+  successMessage,
+  errorMessage,
+}) => {
+  const {
+    login,
+    authError,
+    successMessage: contextSuccessMessage,
+  } = useContext(AuthContext);
   const { values, handleChange, errors, isValid, resetForm } =
     useFormAndValidation();
+  const [localSuccessMessage, setLocalSuccessMessage] = useState('');
+  const [localErrorMessage, setLocalErrorMessage] = useState('');
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    onLogin(values);
-    resetForm();
-    resetForm();
-    onClose();
-  };
+  const handleSubmit = useCallback(
+    async (e) => {
+      e.preventDefault();
+
+      try {
+        await onLogin({ email: values.email, password: values.password });
+        setTimeout(() => {
+          onClose();
+          resetForm();
+        }, 3000);
+      } catch (error) {
+        console.error('Login Failed:', error);
+      }
+    },
+    [onLogin, values, resetForm, onClose],
+  );
 
   return (
     <ModalWithForm
@@ -23,6 +48,8 @@ const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToRegister }) => {
       isSubmitDisabled={!isValid}
       formTabSwitch={onSwitchToRegister}
       switchText='Need to register?'
+      successMessage={successMessage}
+      errorMessage={authError || errorMessage}
     >
       <label className='modal__form-label'>
         Email
@@ -34,7 +61,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToRegister }) => {
           onChange={handleChange}
           required
         />
-        <span>{errors.email}</span>
+        <span className='modal__form-error'>{errors.email}</span>
       </label>
       <label className='modal__form-label'>
         Password
@@ -46,7 +73,7 @@ const LoginModal = ({ isOpen, onClose, onLogin, onSwitchToRegister }) => {
           onChange={handleChange}
           required
         />
-        <span>{errors.password}</span>
+        <span className='modal__form-error'>{errors.password}</span>
       </label>
     </ModalWithForm>
   );
