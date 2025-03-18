@@ -30,22 +30,25 @@ export const ProductsProvider = ({ children }) => {
       try {
         setLoading(true);
         const fetchedProducts = await Api.getItems();
+
         // Check if the fetched data is an array or empty
         if (!fetchedProducts.length || !Array.isArray(fetchedProducts)) {
           console.warn('Could not fetch products from Api, using backup data');
           const normalizedBackup = backup.flatMap((category) =>
             category.items.map(normalizeProductData),
           );
-          setProducts(normalizedBackup);
+          setProducts(normalizedBackup); // Set flattened and normalized products
           return;
         }
+
         // Normalize the fetched data
         const normalizedProducts = fetchedProducts.map(normalizeProductData);
         setProducts(normalizedProducts);
-        //  Extract all normalized categories
+
+        // Extract all normalized categories
         const categories = new Set();
         normalizedProducts.forEach((product) => {
-          if (Array.isArrray(product.categories)) {
+          if (Array.isArray(product.categories)) {
             product.categories
               .flat()
               .forEach((category) => categories.add(category));
@@ -68,7 +71,7 @@ export const ProductsProvider = ({ children }) => {
         const normalizedBackup = backup.flatMap((category) =>
           category.items.map(normalizeProductData),
         );
-        setProducts(normalizedBackup);
+        setProducts(normalizedBackup); // Set flattened and normalized products
       } finally {
         setLoading(false);
       }

@@ -5,10 +5,13 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import './Card.css';
 import { CartContext } from '../../context/CartContext';
-import products from '../../utils/products';
+import images from '../../images/products';
 
 export const formatProductData = (productFormatted) => {
-  if (!productFormatted || !productFormatted.imageUrl) return null;
+  if (!productFormatted || !productFormatted.imageUrl) {
+    console.log('Product data is missing or invalid:', productFormatted);
+    return null;
+  }
   return {
     ...productFormatted,
     imageUrl: productFormatted.imageUrl.startsWith('http')
@@ -91,8 +94,9 @@ const Card = ({
       <div className='card__image-container'>
         <img
           onError={(e) => {
-            e.target.src = { products }.imageUrl;
-            console.warn('Image failed to load, using fallback');
+            e.target.src =
+              images.find((item) => item.name === name)?.imageUrl || '';
+            console.warn('Image failed to load, using placeholder');
           }}
           src={imageUrl}
           alt={name}

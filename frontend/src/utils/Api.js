@@ -119,7 +119,7 @@ const Api = {
       return await response.json();
     } catch (error) {
       console.warn('Failed to fetchs from Api. Using hardcoded data');
-      return products.flatMap((category) => category.items);
+      return products;
     }
   },
   addToCart: async (data, token) => {

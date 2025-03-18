@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
+import { ProductsContext } from '../../context/ProductsContext';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
@@ -9,22 +10,21 @@ import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import Card, { formatProductData } from '../Card/Card';
 import './Home.css';
 
-const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
+const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useContext(AuthContext);
+  const { products, loading: productsLoading } = useContext(ProductsContext);
+  const { featuredProducts } = useFeaturedProducts();
+  const { favorites, toggleFavorite } = useFavorites();
   const {
     cartItems,
     addToCart,
-    removeFromCart,
-    updateCartItemQuantity,
-    saveForLater,
-    moveToCart,
-    removeSavedItem,
     fetchCart,
     getSavedItems,
+    fetchOrders,
+    removeSavedItem,
   } = useContext(CartContext);
-  const { favorites, toggleFavorite } = useFavorites();
-  const { featuredProducts } = useFeaturedProducts();
+
   const [modalStates, setModalStates] = useState({
     showPreview: false,
     showBuyModal: false,
@@ -32,11 +32,11 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
     productToBuy: null,
   });
   const [previewQuantity, setPreviewQuantity] = useState(1);
+  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const initializeData = async () => {
       try {
-        await fetchItems();
         if (isLoggedIn) {
           await Promise.all([fetchOrders(), fetchCart(), getSavedItems()]);
         }
@@ -45,9 +45,12 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
       }
     };
     initializeData();
-  }, [isLoggedIn, fetchItems, fetchOrders, fetchCart, getSavedItems]);
-
-  useEffect(() => {}, [featuredProducts]);
+    console.log('Featured Products:', featuredProducts);
+    console.log('Products:', products);
+    console.log('Cart Items:', cartItems);
+    console.log('Favorites:', favorites);
+    console.log('Orders:', orders);
+  }, [isLoggedIn, fetchOrders, fetchCart, getSavedItems]);
 
   const handleShowPreview = (product) => {
     setModalStates((prev) => ({
@@ -121,7 +124,7 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
 
             return (
               <Card
-                key={product._id}
+                key={product._id || `${product.name}-${product.price}`}
                 product={product}
                 isFeatured={isFeatured}
                 onAddToCart={() => handleAddToCart(product)}
@@ -163,7 +166,7 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
             const product = order.item[0];
             return (
               <Card
-                key={order._id}
+                key={order._id || `${product.name}-${order.price}`}
                 product={{ ...product, price: product.price || order.price }}
                 isFeatured={product.isFeatured}
                 onAddToCart={() => handleAddToCart(product)}
@@ -196,7 +199,9 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
           {cartItems.map((item) => (
             <Card
               isFeatured={item.product.isFeatured}
-              key={item.product?._id}
+              key={
+                item.product?._id || `${item.product?.name}-${item.quantity}`
+              }
               product={item.product || item.name}
               onAddToCart={() => handleAddToCart(item.product)}
               onBuyNow={() => handleShowBuyModal(item.product)}
@@ -245,7 +250,7 @@ const Home = ({ items, orders, fetchItems, fetchOrders, savedItems }) => {
       )}
 
       {renderFeaturedSection()}
-      {renderProductGrid(items, 'Products')}
+      {renderProductGrid(products, 'Products')}
 
       {isLoggedIn && (
         <>
