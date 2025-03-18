@@ -5,6 +5,7 @@ import { useFavorites } from '../../context/FavoritesContext';
 import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
 import './Card.css';
 import { CartContext } from '../../context/CartContext';
+import products from '../../utils/products';
 
 export const formatProductData = (productFormatted) => {
   if (!productFormatted || !productFormatted.imageUrl) return null;
@@ -90,7 +91,7 @@ const Card = ({
       <div className='card__image-container'>
         <img
           onError={(e) => {
-            e.target.src = '/Images/products/default.jpg';
+            e.target.src = { products }.imageUrl;
             console.warn('Image failed to load, using fallback');
           }}
           src={imageUrl}

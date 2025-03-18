@@ -1,3 +1,5 @@
+import products from './products';
+
 const BASE_URL = 'http://localhost:5000' || 'https://fakestoreapi.com/products';
 
 const checkIfAdmin = async (token) => {
@@ -111,9 +113,13 @@ const Api = {
         },
       });
 
-      return handleResponse(response);
+      if (!response.ok) {
+        throw new Error('Failed to fetch items');
+      }
+      return await response.json();
     } catch (error) {
-      return handleError(error, 'getItems');
+      console.warn('Failed to fetchs from Api. Using hardcoded data');
+      return products.flatMap((category) => category.items);
     }
   },
   addToCart: async (data, token) => {

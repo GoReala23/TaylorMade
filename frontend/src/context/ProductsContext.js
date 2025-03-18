@@ -45,7 +45,7 @@ export const ProductsProvider = ({ children }) => {
         //  Extract all normalized categories
         const categories = new Set();
         normalizedProducts.forEach((product) => {
-          if (Array.isArray(product.categories)) {
+          if (Array.isArrray(product.categories)) {
             product.categories
               .flat()
               .forEach((category) => categories.add(category));
