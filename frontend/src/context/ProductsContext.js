@@ -1,5 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 import Api from '../utils/Api';
+import backup from '../utils/products';
 
 export const ProductsContext = createContext();
 
@@ -27,32 +28,47 @@ export const ProductsProvider = ({ children }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
+        setLoading(true);
         const fetchedProducts = await Api.getItems();
-
+        // Check if the fetched data is an array or empty
+        if (!fetchedProducts.length || !Array.isArray(fetchedProducts)) {
+          console.warn('Could not fetch products from Api, using backup data');
+          const normalizedBackup = backup.flatMap((category) =>
+            category.items.map(normalizeProductData),
+          );
+          setProducts(normalizedBackup);
+          return;
+        }
+        // Normalize the fetched data
         const normalizedProducts = fetchedProducts.map(normalizeProductData);
         setProducts(normalizedProducts);
+        //  Extract all normalized categories
+        const categories = new Set();
+        normalizedProducts.forEach((product) => {
+          if (Array.isArray(product.categories)) {
+            product.categories
+              .flat()
+              .forEach((category) => categories.add(category));
+          } else if (product.categories) {
+            categories.add(product.categories);
+          }
+        });
 
-        const categories = normalizedProducts.reduce((acc, product) => {
-          const productCategories = Array.isArray(product.categories)
-            ? product.categories.flat()
-            : [product.categories];
-          productCategories.forEach((category) => {
-            if (!acc.includes(category)) {
-              acc.push(category);
-            }
-          });
-          return acc;
-        }, []);
-
-        categories.forEach((category) => {
-          const categoryItems = normalizedProducts.filter((product) =>
+        // Group products by category
+        const categoryGroups = {};
+        Array.from(categories).forEach((category) => {
+          categoryGroups[category] = normalizedProducts.filter((product) =>
             Array.isArray(product.categories)
               ? product.categories.flat().includes(category)
-              : product.categories.includes(category),
+              : product.categories === category,
           );
         });
       } catch (error) {
-        console.error('Failed to fetch products:', error);
+        console.error('Error fetching products:', error);
+        const normalizedBackup = backup.flatMap((category) =>
+          category.items.map(normalizeProductData),
+        );
+        setProducts(normalizedBackup);
       } finally {
         setLoading(false);
       }
