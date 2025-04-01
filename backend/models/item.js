@@ -4,6 +4,11 @@ const { validate } = require('./user');
 
 const itemSchema = new mongoose.Schema(
   {
+    productId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     _id: {
       type: mongoose.Schema.Types.ObjectId,
       default: () => new mongoose.Types.ObjectId(),

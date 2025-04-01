@@ -13,21 +13,11 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister, initialTab }) => {
     setActiveTab(initialTab || 'login');
   }, [initialTab, isOpen]);
 
-  // useEffect(() => {
-  //   setActiveTab(initialTab || 'login');
-  // }, [initialTab, isOpen]);
-  // useEffect(() => {
-  //   if (successMessage) {
-  //     console.log('[AuthModal] Success message updated:', successMessage);
-  //   }
-  // }, [successMessage]);
-
   const handleRegister = async (userData) => {
     try {
       await onRegister(userData);
       setSuccessMessage('Registration successful! 🎉'); //  Define successMessage
       setErrorMessage('');
-      console.log('[AuthModal] Success message set:', successMessage);
 
       setTimeout(() => {
         setSuccessMessage('');
@@ -49,9 +39,8 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister, initialTab }) => {
   const handleLogin = async (userData) => {
     try {
       await onLogin(userData);
-      setSuccessMessage('Login successful! '); //  Define successMessage
+      setSuccessMessage('Login successful! ');
       setErrorMessage('');
-      console.log('[AuthModal] Success message set:', successMessage);
 
       setTimeout(() => {
         setSuccessMessage('');

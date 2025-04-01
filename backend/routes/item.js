@@ -2,6 +2,7 @@ const express = require('express');
 const {
   createItem,
   getItems,
+  bulkCreateItems,
   getItemById,
   updateItem,
   deleteItem,
@@ -42,6 +43,9 @@ router.patch(
     }
   }
 );
+
+// for emergency use only
+router.post('/bulk-create-items', bulkCreateItems);
 
 // POST /api/items - Create a new item
 router.post('/', createItem);
@@ -90,6 +94,3 @@ router.get('/api/check-db', async (req, res) => {
 });
 
 module.exports = router;
-
-// for emergency use only
-// router.post('/bulk-create-items', bulkCreateItems);

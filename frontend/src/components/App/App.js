@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, useCallback } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
@@ -20,7 +20,7 @@ import Footer from '../Footer/Footer';
 import Api from '../../utils/Api';
 import './App.css';
 import '../../fonts/fonts.css';
-import { formatProductData } from '../Card/Card';
+// import { formatProductData } from '../Card/Card';
 
 const App = ({ token }) => {
   const { isLoggedIn, currentUser } = useContext(AuthContext);
@@ -42,14 +42,17 @@ const App = ({ token }) => {
 
   const [showCartModal, setShowCartModal] = useState(false);
 
-  const updateUser = async (userData) => {
-    try {
-      await Api.updateUser(token, userData);
-      alert('Profile updated successfully!');
-    } catch (error) {
-      console.error('Error updating profile:', error);
-    }
-  };
+  const updateUser = useCallback(
+    async (userData) => {
+      try {
+        await Api.updateUser(token, userData);
+        alert('Profile updated successfully!');
+      } catch (error) {
+        console.error('Error updating profile:', error);
+      }
+    },
+    [token],
+  );
 
   //  Fetch Items
   const fetchItems = async () => {
@@ -65,6 +68,7 @@ const App = ({ token }) => {
   const fetchOrders = async () => {
     try {
       const tokenFetched = localStorage.getItem('token');
+
       const data = await Api.getUserOrders(tokenFetched);
       setOrders(data);
     } catch (error) {
@@ -85,7 +89,7 @@ const App = ({ token }) => {
   const openPreview = (product) => {
     setModalStates({
       type: 'preview',
-      product: formatProductData(product),
+      product,
       quantity: 1,
     });
     console.log('Preview Product:', product);
@@ -95,7 +99,7 @@ const App = ({ token }) => {
   const openBuyModal = (product) => {
     setModalStates({
       type: 'buy',
-      product: formatProductData(product),
+      product,
       quantity: 1,
     });
   };
@@ -111,109 +115,12 @@ const App = ({ token }) => {
   // Fetch Data When Logged In
   useEffect(() => {
     if (isLoggedIn) {
-      fetchItems();
-      fetchOrders();
-      // fetchCart();
-      // fetchSavedItems();
+      const fetchData = async () => {
+        await Promise.all([fetchItems(), fetchOrders()]);
+      };
+      fetchData();
     }
-  }, [isLoggedIn, token]);
-
-  //  Fetch Cart
-  // const fetchCart = async () => {
-  //   try {
-  //     const tokenFetched = localStorage.getItem('token');
-  //     const data = await Api.getCart(tokenFetched);
-  //     setCart(data);
-  //     // console.log(data);
-  //   } catch (error) {
-  //     console.error('Error fetching cart:', error);
-  //   }
-  // };
-
-  //  Fetch Saved Items
-  // const fetchSavedItems = async () => {
-  //   try {
-  //     const tokenFetched = localStorage.getItem('token');
-  //     const data = await Api.getSavedItems(tokenFetched);
-  //     setSavedItems(data);
-  //     // console.log(data);
-  //   } catch (error) {
-  //     console.error('Error fetching saved items:', error);
-  //   }
-  // };
-
-  // Update User Profile
-
-  //  Add Item to Cart
-  // const addToCart = async (product) => {
-  //   try {
-  //     await Api.addToCart(product, token);
-  //     fetchCart();
-  //   } catch (error) {
-  //     console.error('Error adding to cart:', error);
-  //   }
-  // };
-
-  //  Remove Item from Cart
-  // const removeFromCart = async (productId) => {
-  //   try {
-  //     await Api.removeFromCart(productId, token);
-  //     fetchCart();
-  //   } catch (error) {
-  //     console.error('Error removing from cart:', error);
-  //   }
-  // };
-
-  //  Save Item for Later
-  // const saveForLater = async (productId, quantity) => {
-  //   try {
-  //     await Api.saveForLater(productId, token, quantity);
-  //     fetchCart();
-  //     fetchSavedItems();
-  //   } catch (error) {
-  //     console.error('Error saving item for later:', error);
-  //   }
-  // };
-  //  Move Saved Item to Cart
-  // const moveToCart = async (productId) => {
-  //   try {
-  //     await Api.moveToCart(productId, token);
-  //     fetchCart();
-  //     fetchSavedItems();
-  //   } catch (error) {
-  //     console.error('Error moving saved item to cart:', error);
-  //   }
-  // };
-
-  //  Remove Saved Item
-  // const removeSavedItem = async (productId) => {
-  //   try {
-  //     await Api.removeSaved(productId, token);
-  //     fetchSavedItems();
-  //   } catch (error) {
-  //     console.error('Error removing saved item:', error);
-  //   }
-  // };
-
-  //  Update Cart Quantity
-  // const updateCartQuantity = async (productId, newQuantity) => {
-  //   try {
-  //     await Api.updateCartQuantity(productId, newQuantity, token);
-  //     fetchCart();
-  //   } catch (error) {
-  //     console.error('Error updating cart quantity:', error);
-  //   }
-  // };
-
-  // //  Update Saved Item Quantity
-  // const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
-  //   try {
-  //     await Api.updateSavedItemQuantity(savedItemId, newQuantity, token);
-  //     // fetchSavedItems();
-  //   } catch (error) {
-  //     console.error('Error updating saved item quantity:', error);
-  //   }
-  // };
+  }, [isLoggedIn]);
 
   return (
     <div className='App'>
@@ -245,16 +152,6 @@ const App = ({ token }) => {
                   fetchItems={fetchItems}
                   fetchOrders={fetchOrders}
                   savedItems={savedItems}
-                  // cartItems={cart}
-                  // addToCart={addToCart}
-                  // removeFromCart={removeFromCart}
-                  // updateCartQuantity={updateCartQuantity}
-                  // saveForLater={saveForLater}
-                  // fetchCart={fetchCart}
-                  // fetchSavedItems={fetchSavedItems}
-                  // likeItem={likeItem}
-                  // moveToCart={moveToCart}
-                  // removeSavedItem={removeSavedItem}
                 />
               ) : (
                 <Navigate to='/' state={{ openLogin: true }} />
@@ -272,19 +169,10 @@ const App = ({ token }) => {
                 fetchItems={fetchItems}
                 fetchOrders={fetchOrders}
                 fetchCart={fetchCart}
-                // fetchSavedItems={fetchSavedItems}
                 likeItem={likeItem}
-                // moveToCart={moveToCart}
-                // removeSavedItem={removeSavedItem}
                 openPreview={openPreview}
                 openBuyModal={openBuyModal}
                 featuredProducts={featuredProducts}
-                // modalState={modalStates || {}}
-                // setModalState={setModalStates}
-                // closeModal={closeModal}                // addToCart={addToCart}
-                // removeFromCart={removeFromCart}
-                // updateCartQuantity={updateCartQuantity}
-                // saveForLater={saveForLater}
               />
             }
           />
@@ -293,7 +181,6 @@ const App = ({ token }) => {
             element={
               <Products
                 items={items}
-                // addToCart={addToCart}
                 likeItem={likeItem}
                 fetchItems={fetchItems}
                 openPreview={openPreview}

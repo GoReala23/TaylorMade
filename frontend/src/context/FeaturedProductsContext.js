@@ -1,28 +1,57 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
-import { ProductsContext } from './ProductsContext';
+import { createContext, useContext, useState, useEffect } from 'react';
+import { useProducts } from './ProductsContext';
 import Api from '../utils/Api';
 
 export const FeaturedProductsContext = createContext();
 
 export const FeaturedProductsProvider = ({ children }) => {
-  const { products, setProducts } = useContext(ProductsContext);
+  const { products } = useProducts();
   const [featuredProducts, setFeaturedProducts] = useState([]);
 
   useEffect(() => {
-    const productsFeatured = () => {
-      const featured = products.filter((product) => product.isFeatured);
-      setFeaturedProducts(featured);
-    };
+    const filteredFeatured = products.filter((product) => {
+      // Basic null/undefined check
+      if (!product) {
+        console.warn('Null or undefined product found in featured products');
+        return false;
+      }
+      // Validate required fields
+      if (
+        !product.name ||
+        typeof product.name !== 'string' ||
+        !product.name.trim()
+      ) {
+        console.warn('Invalid or missing name in featured product:', product);
+        return false;
+      }
+      if (
+        !product.price ||
+        typeof product.price !== 'number' ||
+        product.price <= 0
+      ) {
+        console.warn('Invalid or missing price in featured product:', product);
+        return false;
+      }
+      if (!product.imageUrl || typeof product.imageUrl !== 'string') {
+        console.warn(
+          'Invalid or missing imageUrl in featured product:',
+          product,
+        );
+        return false;
+      }
+      // Check if product is actually featured
+      return product.isFeatured === true;
+    });
 
-    productsFeatured();
+    setFeaturedProducts(filteredFeatured);
   }, [products]);
 
   const toggleFeatured = async (productId) => {
     try {
       await Api.toggleFeaturedProduct(productId);
-      setProducts((prevProducts) =>
-        prevProducts.map((product) =>
-          product.id === productId
+      setFeaturedProducts((prev) =>
+        prev.map((product) =>
+          product._id === productId
             ? { ...product, isFeatured: !product.isFeatured }
             : product,
         ),
@@ -42,13 +71,7 @@ export const FeaturedProductsProvider = ({ children }) => {
 };
 
 export const useFeaturedProducts = () => {
-  const context = React.useContext(FeaturedProductsContext);
-  if (!context) {
-    throw new Error(
-      'useFeaturedProducts must be used within a FeaturedProductsProvider',
-    );
-  }
-  return context;
+  return useContext(FeaturedProductsContext);
 };
 
 export default FeaturedProductsProvider;

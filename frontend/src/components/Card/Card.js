@@ -1,22 +1,35 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState, memo, useMemo } from 'react';
 import { FaHeart, FaStar, FaPlus, FaMinus } from 'react-icons/fa';
 import PropTypes from 'prop-types';
+import { useBackupProducts } from '../../context/BackupProductContext';
 import { useFavorites } from '../../context/FavoritesContext';
-import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
-import './Card.css';
 import { CartContext } from '../../context/CartContext';
-import images from '../../images/products';
+import './Card.css';
 
 export const formatProductData = (productFormatted) => {
-  if (!productFormatted || !productFormatted.imageUrl) {
-    console.log('Product data is missing or invalid:', productFormatted);
+  if (!productFormatted) {
+    console.warn('❌ formatProductData: product is null or undefined');
     return null;
   }
+
+  const requiredFields = ['imageUrl', 'price', 'description', 'name'];
+  const missingFields = requiredFields.filter(
+    (field) => !productFormatted[field],
+  );
+
+  if (missingFields.length > 0) {
+    console.warn(
+      '⚠️ formatProductData: Missing fields:',
+      missingFields,
+      'in product:',
+      productFormatted,
+    );
+    return null;
+  }
+
   return {
     ...productFormatted,
-    imageUrl: productFormatted.imageUrl.startsWith('http')
-      ? productFormatted.imageUrl
-      : `http://localhost:5000${productFormatted.imageUrl}`,
+    imageUrl: productFormatted.imageUrl,
     price: productFormatted.price || productFormatted.item?.price || 0,
     description: productFormatted.description || 'No description available',
     isSaved: productFormatted.isSaved || false,
@@ -41,31 +54,25 @@ const Card = ({
   isSavedItem = false,
   initialQuantity = 1,
   showQuantity = false,
-  isFeatured,
+  isFeatured = false,
   cartCardSize,
   ...props
 }) => {
   const { favorites } = useFavorites();
-  const { featuredProducts } = useFeaturedProducts();
+  const { products } = useBackupProducts();
   const [quantity, setQuantity] = useState(initialQuantity);
-  const {
-    handleQuantityChange,
-    updateSavedItemQuantity,
-    updateCartItemQuantity,
-  } = useContext(CartContext);
-  const { isFeatured: isFeaturedProduct } =
-    featuredProducts.find((p) => p._id === product._id) || {};
-  const isLiked = favorites?.some((fav) => fav._id === product._id);
   const [localQuantity, setLocalQuantity] = useState(initialQuantity);
+  const { handleQuantityChange } = useContext(CartContext);
+
+  const isLiked = favorites?.some((fav) => fav._id === product._id);
 
   const formattedProduct = useMemo(() => formatProductData(product), [product]);
 
   if (!formattedProduct) {
-    console.warn('Incomplete product data:', product);
+    console.warn('Incomplete product product', product || formattedProduct);
     return null;
   }
-
-  const { name, price, description, imageUrl, isf } = formattedProduct;
+  const { name, price, description, imageUrl } = formattedProduct;
 
   const handleAddToCart = (e) => {
     e.stopPropagation();
@@ -93,12 +100,9 @@ const Card = ({
     >
       <div className='card__image-container'>
         <img
-          onError={(e) => {
-            e.target.src =
-              images.find((item) => item.name === name)?.imageUrl || '';
-            console.warn('Image failed to load, using placeholder');
-          }}
-          src={imageUrl}
+          src={(() => {
+            return imageUrl;
+          })()}
           alt={name}
           className='card__image'
         />
@@ -122,6 +126,7 @@ const Card = ({
         <h3 className='card__title'>{name}</h3>
         <p className='card__price'>${price.toFixed(2)}</p>
       </div>
+
       <div className='card__actions'>
         {isAdmin && (
           <button onClick={onToggleFeatured}>
@@ -136,13 +141,7 @@ const Card = ({
             <button className='card__buy-now' onClick={() => onBuyNow(product)}>
               Buy Now
             </button>
-            <button
-              className='card__remove'
-              onClick={() => {
-                console.log('Remove button clicked');
-                onRemove();
-              }}
-            >
+            <button className='card__remove' onClick={onRemove}>
               Remove
             </button>
           </>
@@ -170,6 +169,7 @@ const Card = ({
           </>
         )}
       </div>
+
       {showQuantity && (
         <div className='card__quantity'>
           <button onClick={() => handleQuantityUpdate(localQuantity - 1)}>
@@ -195,13 +195,7 @@ const Card = ({
 };
 
 Card.propTypes = {
-  product: PropTypes.shape({
-    name: PropTypes.string.isRequired,
-    price: PropTypes.number.isRequired,
-    description: PropTypes.string,
-    imageUrl: PropTypes.string.isRequired,
-    isFeatured: PropTypes.bool,
-  }).isRequired,
+  product: PropTypes.object.isRequired,
   isAdmin: PropTypes.bool,
   onAddToCart: PropTypes.func,
   onBuyNow: PropTypes.func,

@@ -13,13 +13,15 @@ const {
 const { default: mongoose, get } = require('mongoose');
 
 // Add item to cart
-const addItemToCart = async (req, res, next) => {
-  const { productId, quantity } = req.body;
-  const userId = req.user.userId;
-
+const addItemToCart = async (req, res) => {
   try {
-    if (!productId) {
-      return next(new BadRequestError('Product ID is required'));
+    const { productId, quantity } = req.body;
+    const userId = req.user.userId;
+
+    //  Find item by productId
+    const item = await Item.findOne({ productId });
+    if (!item) {
+      return res.status(404).json({ message: 'Product not found' });
     }
 
     let cart = await Cart.findOne({ user: userId });
@@ -27,24 +29,37 @@ const addItemToCart = async (req, res, next) => {
       cart = await Cart.create({ user: userId, items: [] });
     }
 
-    const existingItem = cart.items.find(
-      (item) => item.product.toString() === productId
+    // Use item._id for reference
+    const existingCartItem = cart.items.find(
+      (i) => i.product.toString() === item._id.toString()
     );
 
-    if (existingItem) {
-      existingItem.quantity += quantity;
+    if (existingCartItem) {
+      existingCartItem.quantity += quantity;
     } else {
-      cart.items.push({ product: productId, quantity });
+      cart.items.push({ product: item._id, quantity });
     }
 
     await cart.save();
 
-    // console.log(`Cart updated successfully for user: ${userId}: ${productId}`);
-    res.status(200).json(cart);
+    console.log('🧪 Cart before populate:', cart.items);
+
+    // : Populate using correct path
+    const updatedCart = await Cart.findOne({ user: userId }).populate(
+      'items.product'
+    );
+
+    console.log('✅ After populate:', updatedCart.items);
+
+    res
+      .status(200)
+      .json({ message: 'Product added to cart', items: updatedCart.items });
   } catch (error) {
-    next(new ServerError('An error occurred while adding item to cart'));
+    console.error('Error in addToCart:', error.message);
+    res.status(500).json({ message: 'Error adding to cart' });
   }
 };
+
 // Remove item from cart
 const removeItemFromCart = async (req, res, next) => {
   const { productId } = req.params;
@@ -141,7 +156,7 @@ const getCart = async (req, res, next) => {
 
     let cart = await Cart.findOne({ user: userId }).populate('items.product');
 
-    // console.log('Existing Cart data:', cart);
+  
 
     if (!cart) {
       cart = await Cart.create({ user: userId, items: [] });
@@ -283,42 +298,3 @@ module.exports = {
   getSavedItems,
 };
 
-// Update item quantity in cart
-
-// const updateCartItemQuantity = async (productId, newQuantity) => {
-//   try {
-//     const token = localStorage.getItem('token');
-//     const response = await Api.updateCartQuantity(
-//       productId,
-//       newQuantity,
-//       token
-//     );
-//     if (response && response.cart) {
-//       setCartItems((prev) =>
-//         prev.map((item) =>
-//           item.product._id === productId
-//             ? { ...item, quantity: newQuantity }
-//             : item
-//         )
-//       );
-//     }
-//   } catch (error) {
-//     console.error('Error updating cart quantity:', error);
-//   }
-// };
-// Update saved item quantity
-// const updateSavedItemQuantity = async (savedItemId, newQuantity) => {
-//   try {
-//     const token = localStorage.getItem('token');
-//     const response = await Api.updateSavedItemQuantity(
-//       savedItemId,
-//       newQuantity,
-//       token
-//     );
-//     if (response && response.savedItems) {
-//       setSavedItems(response.savedItems);
-//     }
-//   } catch (error) {
-//     console.error('Error updating saved item quantity:', error);
-//   }
-// };

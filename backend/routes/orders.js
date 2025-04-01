@@ -19,7 +19,7 @@ const router = express.Router();
 router.patch('/:orderId/status', auth, adminMiddleware, updateOrderStatus);
 
 // Delete an order
-router.delete('/orders/:orderId', auth, adminMiddleware, removeOrder);
+router.delete('/:orderId', auth, adminMiddleware, removeOrder);
 
 // User routes
 

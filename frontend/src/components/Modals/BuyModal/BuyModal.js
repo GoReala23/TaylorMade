@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useOrders } from '../../../context/OrdersContext';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
 import useFormAndValidation from '../../../hooks/useFormAndValidation';
 import Api from '../../../utils/Api';
@@ -11,17 +12,24 @@ const BuyModal = ({
   quantity,
   onSwitchToRegister,
   onPurchase,
+  isFeatured = false,
 }) => {
   const { values, handleChange, errors, isValid } = useFormAndValidation();
+  const { createOrder } = useOrders();
   const [submitStatus, setSubmitStatus] = useState({ success: '', error: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  useEffect(() => {}, [isOpen, product, quantity]);
+  useEffect(() => {
+    if (isOpen && product) {
+      setSubmitStatus({ success: '', error: '' });
+      setIsSubmitting(false);
+    }
+  }, [isOpen, product, quantity]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!isValid || isSubmitting) return;
-    setIsSubmitting(true);
+
     setSubmitStatus({ success: '', error: '' });
     try {
       const token = localStorage.getItem('token');
@@ -31,17 +39,12 @@ const BuyModal = ({
       if (!values.name || !values.email || !values.address) {
         throw new Error('Please fill in all required fields');
       }
-      await Api.createOrder(
-        product._id || product.id,
-        quantity,
-        values.address,
-        token,
-      );
+
       setSubmitStatus({ success: 'Order placed successfully!', error: '' });
       setTimeout(() => {
-        onPurchase();
+        onPurchase(product, quantity, values.address);
         onClose();
-      }, 2000);
+      }, 500);
     } catch (error) {
       console.error('Error placing order:', error);
       setSubmitStatus({

@@ -1,43 +1,39 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
+import { useBackupProducts } from '../../context/BackupProductContext';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
+import { useOrders } from '../../context/OrdersContext';
 import { useFavorites } from '../../context/FavoritesContext';
-import { ProductsContext } from '../../context/ProductsContext';
+
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
 import BuyModal from '../Modals/BuyModal/BuyModal';
-import Card, { formatProductData } from '../Card/Card';
+import Card from '../Card/Card';
 import './Products.css';
 
-const Products = ({
-  addToCart,
-  likeItem,
-  openPreview,
-  openBuyModal,
-  modalStates = {},
-  setModalStates,
-  closeModal,
-}) => {
-  const { products } = useContext(ProductsContext);
+const Products = ({ modalStates = {}, setModalStates }) => {
+  const { products, loading } = useBackupProducts();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
+  const { createOrder } = useOrders();
   const { isLoggedIn } = useContext(AuthContext);
   const { addToCart: addToCartContext } = useContext(CartContext);
   const location = useLocation();
-  const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [previewQuantity, setPreviewQuantity] = useState(1);
 
-  useEffect(() => {
-    // Fetch categories from products
-    const fetchedCategories = [
-      'All',
-      'Featured',
-      'Favorites',
-      ...new Set(products.flatMap((product) => product.categories || [])),
-    ];
-    setCategories(fetchedCategories);
-    setLoading(false);
+  const categories = useMemo(() => {
+    if (!products || !Array.isArray(products)) {
+      return ['All'];
+    }
+    const uniqueCategories = new Set(['All']);
+    products.forEach((product) => {
+      if (product?.categories?.length) {
+        product.categories.forEach((cat) => uniqueCategories.add(cat));
+      } else if (product?.category) {
+        uniqueCategories.add(product.category);
+      }
+    });
+    return Array.from(uniqueCategories);
   }, [products]);
 
   useEffect(() => {
@@ -52,7 +48,7 @@ const Products = ({
     setModalStates((prev) => ({
       ...prev,
       showPreview: true,
-      previewProduct: formatProductData(product),
+      previewProduct: product,
       showBuyModal: false,
       productToBuy: null,
     }));
@@ -62,7 +58,7 @@ const Products = ({
     setModalStates((prev) => ({
       ...prev,
       showBuyModal: true,
-      productToBuy: formatProductData(product),
+      productToBuy: product,
       showPreview: false,
       previewProduct: null,
     }));
@@ -70,23 +66,6 @@ const Products = ({
 
   const handleAddToCart = (product) => {
     addToCartContext(product, 1);
-  };
-
-  const handlePurchase = async () => {
-    try {
-      if (!modalStates.productToBuy || !modalStates.productToBuy._id) {
-        throw new Error('Invalid product data');
-      }
-      setModalStates((prev) => ({
-        ...prev,
-        type: 'buy',
-        showBuyModal: true,
-        productToBuy: modalStates.productToBuy,
-      }));
-    } catch (error) {
-      console.error('Error processing purchase:', error);
-      alert('Failed to process purchase. Please try again.');
-    }
   };
 
   const toggleFavorite = (product) => {
@@ -98,46 +77,50 @@ const Products = ({
     }
   };
 
-  const renderProductCard = (product) => (
-    <Card
-      key={product._id}
-      product={formatProductData(product)}
-      isFeatured={product.isFeatured}
-      onAddToCart={() => handleAddToCart(product)}
-      onBuyNow={() => handleShowBuyModal(product)}
-      onFavorite={() => toggleFavorite(product)}
-      onClick={() => handleShowPreview(product)}
-    />
-  );
-
   const renderCategory = () => {
-    const productsToRender = products.filter((product) => {
-      if (selectedCategory === 'All') return true;
-      if (selectedCategory === 'Featured') return product.isFeatured;
-      if (selectedCategory === 'Favorites')
-        return favorites.some((fav) => fav._id === product._id);
-      return product.categories?.includes(selectedCategory);
-    });
+    if (!Array.isArray(products)) {
+      console.error('Products is not an array:', products);
+      return <p>Error loading products. Please try again later.</p>;
+    }
+
+    const filterCategory = (product) => {
+      if (selectedCategory === 'All') {
+        return true;
+      }
+      return (
+        product.categories?.includes(selectedCategory) ||
+        product.category === selectedCategory ||
+        false
+      );
+    };
+
+    const productsToRender = products.filter(filterCategory);
+
     return (
       <div className='products__grid'>
-        {productsToRender.map(renderProductCard)}
+        {productsToRender.map((product, index) => (
+          <Card
+            key={`${product._id}-${index}`}
+            product={product}
+            isFeatured={Boolean(product.isFeatured)}
+            onAddToCart={() => handleAddToCart(product)}
+            onBuyNow={() => handleShowBuyModal(product)}
+            onFavorite={() => toggleFavorite(product)}
+            onClick={() => handleShowPreview(product)}
+          />
+        ))}
       </div>
     );
   };
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
   return (
     <div
       className={`products ${isLoggedIn ? 'products--dashboard' : 'products--no-dashboard'}`}
     >
       <div className='products__container'>
         <div className='products__category-bar'>
-          {categories.map((category) => (
+          {categories.map((category, index) => (
             <button
-              key={category}
+              key={`${category}-${index}`}
               className={`products__category-button ${
                 selectedCategory === category ? 'active' : ''
               }`}
@@ -155,6 +138,7 @@ const Products = ({
           }
           product={modalStates?.previewProduct}
           quantity={previewQuantity}
+          isFeatured={modalStates.previewProduct?.isFeatured || false}
           isLiked={favorites.some(
             (fav) => fav._id === modalStates?.previewProduct?._id,
           )}
@@ -172,7 +156,7 @@ const Products = ({
             }
             quantity={previewQuantity}
             product={modalStates.productToBuy}
-            onPurchase={handlePurchase}
+            onPurchase={() => console.log('Purchase logic here')}
           />
         )}
       </div>

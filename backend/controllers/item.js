@@ -22,7 +22,6 @@ const fetchThirdPartyProducts = async () => {
       },
     });
 
-    // console.log('response:', response);
     if (!response.ok) {
       const errorData = await response.json();
       console.error('Third-party API error:', errorData);
@@ -103,7 +102,6 @@ const getItems = async (req, res, next) => {
     let fakeStoreItems = [];
     try {
       fakeStoreItems = await fetchThirdPartyProducts();
-      // console.log('fakeStoreItems:', fakeStoreItems);
     } catch (error) {
       next(
         new ServerError('An error occurred while fetching third-party products')
@@ -134,7 +132,6 @@ const getItems = async (req, res, next) => {
     };
 
     const filteredFakeStoreItems = filterFoodProducts(fakeStoreItems);
-    // console.log('filteredFakeStoreItems:', filteredFakeStoreItems);
 
     // Transform and save products
     const transformedFakeItems =
@@ -158,12 +155,10 @@ const getItems = async (req, res, next) => {
       ...item,
       source: 'third-party',
     }));
-    // console.log('markedFakeItems:', markedFakeItems);
 
     // Combine local database items with transformed fake store items
     const allItems = [...markedDbItems, ...markedFakeItems];
     res.json(allItems);
-    // console.log('allItems:', allItems);
   } catch (error) {
     console.error('Error fetching items:', error);
     res
@@ -282,7 +277,59 @@ const toggleFeatured = async (req, res, next) => {
     next(new ServerError('An error occurred while toggling featured status'));
   }
 };
-// Bulk create items for emergency product additions
+
+// For Emergency Product Adds
+
+const bulkCreateItems = async (req, res) => {
+  try {
+    const items = req.body;
+
+    if (!Array.isArray(items)) {
+      return res.status(400).json({
+        message: 'Request body must be an array of items',
+      });
+    }
+
+    // Validate each item
+    const invalidItems = items.filter(
+      (item) =>
+        !item.name ||
+        !item.price ||
+        !item.description ||
+        !item.imageUrl ||
+        !item.category ||
+        !['Sweets', 'Meals', 'Breads', 'Butters', 'Others'].includes(
+          item.category
+        )
+    );
+
+    if (invalidItems.length > 0) {
+      return res.status(400).json({
+        message: 'Invalid items found',
+        invalidItems,
+      });
+    }
+
+    // Convert category to an array of strings
+    const itemsWithCategories = items.map((item) => ({
+      ...item,
+      categories: [item.category], // Convert single category to an array
+    }));
+
+    const createdItems = await Item.insertMany(itemsWithCategories);
+
+    res.status(201).json({
+      message: `Successfully created ${createdItems.length} items`,
+      items: createdItems,
+    });
+  } catch (error) {
+    console.error('Error in bulkCreateItems:', error.message);
+    res.status(500).json({
+      message: 'Error creating items',
+      error: error.message,
+    });
+  }
+};
 const getFeaturedProducts = async (req, res, next) => {
   try {
     const items = getItems().find({ isFeatured: true });
@@ -343,7 +390,7 @@ const getFeaturedProducts = async (req, res, next) => {
 // };
 
 module.exports = {
-  // bulkCreateItems,
+  bulkCreateItems,
   createItem,
   getItems,
   getItemById,

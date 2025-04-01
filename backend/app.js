@@ -5,6 +5,7 @@ const routes = require('./routes');
 const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/user');
 const cartRoutes = require('./routes/cart');
+const orderRoutes = require('./routes/orders');
 const errorHandler = require('./middlewares/errorHandler');
 const path = require('path');
 require('dotenv').config();
@@ -12,14 +13,15 @@ require('dotenv').config();
 const app = express();
 
 const mongoURI = process.env.MONGO_URI;
-// console.log('MONGO_URI:', mongoURI);
-// console.log('NODE_ENV:', process.env.NODE_ENV);
-// console.log('MONGO_PW:', process.env.MONGO_PW);
-// console.log('MONGO_USER:', process.env.MONGO_USER);
+
 // Middleware
 app.use(
   cors({
-    origin: ['https://goreala23.github.io', 'http://localhost:3000'],
+    origin: [
+      'https://goreala23.github.io',
+      'http://localhost:5000',
+      'http://localhost:3000',
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -42,9 +44,14 @@ app.use((err, req, res, next) => {
 // Serve static files
 app.use('/Images', express.static(path.join(__dirname, 'public/Images')));
 
+app.use((req, res, next) => {
+  console.log(` ${req.method} ${req.originalUrl}`);
+  next();
+});
+
 // Routes
 app.use('/api', routes);
-app.use('/api/item', routes);
+
 app.use('/api/cart', cartRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/user', userRoutes);

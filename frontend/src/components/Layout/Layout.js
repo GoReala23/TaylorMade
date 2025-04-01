@@ -1,12 +1,12 @@
-import Dashboard from '../Dashboard/Dashboard';
+// import Dashboard from '../Dashboard/Dashboard';
 
-const Layout = ({ children }) => {
-  return (
-    <div className='layout'>
-      <Dashboard />
-      {/* <main>{children}</main> */}
-    </div>
-  );
-};
+// const Layout = ({ children }) => {
+//   return (
+//     <div className='layout'>
+//       <Dashboard />
+//       {/* <main>{children}</main> */}
+//     </div>
+//   );
+// };
 
-export default Layout;
+// export default Layout;

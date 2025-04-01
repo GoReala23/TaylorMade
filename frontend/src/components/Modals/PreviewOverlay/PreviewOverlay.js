@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { CartContext } from '../../../context/CartContext';
 import { AuthContext } from '../../../context/AuthContext';
 import AuthModal from '../AuthModal/AuthModal';
-import { formatProductData } from '../../Card/Card';
 import './PreviewOverlay.css';
 
 const PreviewOverlay = ({
@@ -14,7 +13,7 @@ const PreviewOverlay = ({
   product,
   onQuantityChange,
   quantity,
-  isFeatured,
+  isFeatured = false,
   isLiked,
   onFavorite,
   onBuyNow,
@@ -26,29 +25,18 @@ const PreviewOverlay = ({
 
   if (!isOpen || !product) return null;
 
-  const formattedProduct = formatProductData(product);
-
   const handleAddToCart = async () => {
-    if (!product || !product._id) {
-      console.error('Unable to add to cart: missing product data');
-      return;
-    }
     try {
-      await addToCart({
-        productId: product._id,
-        quantity,
-      });
-    } catch (err) {
-      console.error('Error adding to cart:', err);
+      await addToCart(product);
+    } catch (error) {
+      console.error('Error adding to cart:', error);
     }
   };
 
   const handleBuyNow = () => {
     if (typeof onBuyNow === 'function') {
       onClose();
-      onBuyNow(formattedProduct);
-    } else {
-      console.error('onBuyNow is not a function');
+      onBuyNow(product);
     }
   };
 
@@ -60,12 +48,12 @@ const PreviewOverlay = ({
         </button>
         <div className='preview__image-container'>
           <img
-            src={formattedProduct.imageUrl}
-            alt={formattedProduct.name}
+            src={product.imageUrl}
+            alt={product.name}
             className='preview__image'
           />
           <div className='preview__icons'>
-            {isFeatured && (
+            {product.isFeatured && (
               <FaStar className='preview__star-icon' color='gold' size={24} />
             )}
             <FaHeart
@@ -74,17 +62,17 @@ const PreviewOverlay = ({
               onClick={(e) => {
                 e.stopPropagation();
                 if (onFavorite) {
-                  onFavorite(formattedProduct);
+                  onFavorite(product);
                 }
               }}
             />
           </div>
         </div>
         <div className='preview__content'>
-          <h3 className='preview__title'>{formattedProduct.name}</h3>
-          <p className='preview__description'>{formattedProduct.description}</p>
+          <h3 className='preview__title'>{product.name}</h3>
+          <p className='preview__description'>{product.description}</p>
           <div className='preview__price-container'>
-            <p className='preview__price'>${formattedProduct.price}</p>
+            <p className='preview__price'>${product.price}</p>
             <div className='preview__quantity-controls'>
               <button
                 onClick={() => onQuantityChange(Math.max(1, quantity - 1))}
@@ -99,33 +87,31 @@ const PreviewOverlay = ({
             </p>
           </div>
           <div className='preview__actions'>
-            <div className='preview__actions'>
-              {!isLoggedIn ? (
-                <button
-                  onClick={() => setIsAuthModalOpen(true)}
-                  className='preview__button '
-                >
-                  Log-in to Purchase
+            {!isLoggedIn ? (
+              <button
+                onClick={() => setIsAuthModalOpen(true)}
+                className='preview__button'
+              >
+                Log-in to Purchase
+              </button>
+            ) : (
+              <>
+                <button onClick={handleAddToCart} className='preview__button'>
+                  Add to Cart
                 </button>
-              ) : (
-                <>
-                  <button onClick={handleAddToCart} className='preview__button'>
-                    Add to Cart
-                  </button>
-                  <button onClick={handleBuyNow} className='preview__button'>
-                    Buy Now
-                  </button>
-                </>
-              )}
-              {isAuthModalOpen && (
-                <AuthModal
-                  isOpen={isAuthModalOpen}
-                  onClose={() => setIsAuthModalOpen(false)}
-                  onLogin={() => navigate('/login')}
-                  onRegister={() => navigate('/register')}
-                />
-              )}
-            </div>
+                <button onClick={handleBuyNow} className='preview__button'>
+                  Buy Now
+                </button>
+              </>
+            )}
+            {isAuthModalOpen && (
+              <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
+                onLogin={() => navigate('/login')}
+                onRegister={() => navigate('/register')}
+              />
+            )}
           </div>
         </div>
       </div>

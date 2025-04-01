@@ -6,9 +6,11 @@ import App from './components/App/App';
 import { AuthProvider } from './context/AuthContext';
 import { FeaturedProductsProvider } from './context/FeaturedProductsContext';
 import { ProductsProvider } from './context/ProductsContext';
+import { BackupProductProvider } from './context/BackupProductContext';
 import reportWebVitals from './reportWebVitals';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { CartProvider } from './context/CartContext';
+import { OrdersProvider } from './context/OrdersContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
@@ -18,11 +20,16 @@ root.render(
         <ProductsProvider>
           {' '}
           <FeaturedProductsProvider>
-            <FavoritesProvider>
-              <CartProvider>
-                <App />
-              </CartProvider>
-            </FavoritesProvider>
+            <BackupProductProvider>
+              {' '}
+              <FavoritesProvider>
+                <CartProvider>
+                  <OrdersProvider>
+                    <App />
+                  </OrdersProvider>
+                </CartProvider>
+              </FavoritesProvider>
+            </BackupProductProvider>
           </FeaturedProductsProvider>
         </ProductsProvider>
       </AuthProvider>

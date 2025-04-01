@@ -1,6 +1,8 @@
-import products from './products';
-
-const BASE_URL = 'http://localhost:5000' || 'https://fakestoreapi.com/products';
+const BASE_URL =
+  process.env.NODE_ENV === 'development'
+    ? 'http://localhost:5000'
+    : process.env.REACT_APP_API_URL || 'https://taylormade.onrender.com';
+console.log('Api BASE_URL:', BASE_URL);
 
 const checkIfAdmin = async (token) => {
   try {
@@ -113,17 +115,20 @@ const Api = {
         },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch items');
-      }
-      return await response.json();
+      return handleResponse(response);
     } catch (error) {
-      console.warn('Failed to fetchs from Api. Using hardcoded data');
-      return products;
+      return handleError(error, 'getItems');
     }
   },
   addToCart: async (data, token) => {
     try {
+      if (!token) {
+        throw new Error('No authentication token provided');
+      }
+
+      if (!data || !data.productId) {
+        throw new Error('Invalid product data provided');
+      }
       const response = await fetch(`${BASE_URL}/api/cart/add`, {
         method: 'POST',
         headers: {
@@ -132,10 +137,27 @@ const Api = {
         },
         body: JSON.stringify(data),
       });
-      alert('Item added to cart');
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to add item to cart');
+      }
+      return await response.json();
+    } catch (error) {
+      console.error('AddToCart Error:', error);
+      throw error;
+    }
+  },
+
+  getThirdPartyProducts: async () => {
+    try {
+      const response = await fetch('https://fakestoreapi.com/products');
+      if (!response.ok) {
+        throw new Error('Failed to fetch third-party products');
+      }
       return handleResponse(response);
     } catch (error) {
-      return handleError(error, 'addToCart');
+      console.error('Error fetching third-party products:', error);
+      return handleError(error, 'getThirdPartyProducts');
     }
   },
 
@@ -426,11 +448,10 @@ const Api = {
 
   getFeaturedProducts: async () => {
     try {
-      console.log('getFeaturedProducts');
       const response = await fetch(`${BASE_URL}/api/item/featured`);
-      console.log(response);
+
       const data = await handleResponse(response);
-      console.log('Processed data:', data);
+
       return data;
     } catch (error) {
       return handleError(error, 'getFeaturedProducts');

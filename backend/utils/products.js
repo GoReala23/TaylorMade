@@ -3,46 +3,47 @@ const products = [
     category: 'Sweets',
     items: [
       {
-        _id: 1,
         name: 'Chocolate Cake',
         price: 15.99,
         description: 'Rich chocolate cake',
-        imageUrl: '/Images/products/chocolate_cake.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/chocolate_cake_ub4vsp.webp',
+        isFeatured: true,
       },
       {
-        _id: 2,
         name: 'Colorful Macarons',
         price: 10.99,
         description: 'Assorted macarons in various flavors',
-        imageUrl: '/Images/products/macarons.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/macarons_kjne5p.webp',
       },
       {
-        _id: 3,
         name: 'Caramel Pudding',
         price: 7.99,
         description: 'Creamy caramel pudding',
-        imageUrl: '/Images/products/caramel_pudding.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926165/caramel_pudding_gyvkke.webp',
       },
       {
-        _id: 4,
         name: 'Strawberry Shortcake',
         price: 12.99,
         description: 'Classic strawberry shortcake',
-        imageUrl: '/Images/products/strawberry_shortcake.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/strawberry_shortcake_rzyon7.webp',
       },
       {
-        _id: 5,
         name: 'Fudge Brownies',
         price: 8.99,
         description: 'Dense and chocolatey fudge brownies',
-        imageUrl: '/Images/products/fudge_brownies.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926168/fudge_brownies_d6d9r8.webp',
       },
       {
-        _id: 6,
         name: 'Vanilla Cupcakes',
         price: 6.99,
         description: 'Vanilla cupcakes with buttercream frosting',
-        imageUrl: '/Images/products/vanilla_cupcakes.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926181/vanilla_cupcakes_s96wfb.webp',
       },
     ],
   },
@@ -50,46 +51,47 @@ const products = [
     category: 'Meals',
     items: [
       {
-        _id: 101,
         name: 'Chicken Pasta',
         price: 12.99,
         description: 'Creamy chicken pasta',
-        imageUrl: '/Images/products/chicken_pasta.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926166/chicken_pasta_-_Copy_qqdotz.webp',
       },
       {
-        _id: 102,
         name: 'Grilled Steak',
         price: 18.99,
         description: 'Juicy grilled steak with vegetables',
-        imageUrl: '/Images/products/steak.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926168/grilled_steak_ir66ju.webp',
       },
       {
-        _id: 103,
         name: 'Herb-Roasted Chicken',
         price: 15.99,
         description: 'Tender herb-roasted chicken',
-        imageUrl: '/Images/products/herb_chicken.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926168/herb_chicken_rrvjzl.webp',
       },
       {
-        _id: 104,
         name: 'Salmon with Lemon',
         price: 19.99,
         description: 'Pan-seared salmon with lemon garnish',
-        imageUrl: '/Images/products/salmon.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/salmon_vqtosq.webp',
+        isFeatured: true,
       },
       {
-        _id: 105,
         name: 'Vegetarian Lasagna',
         price: 13.99,
         description: 'Vegetarian lasagna with layers of veggies',
-        imageUrl: '/Images/products/vegetarian_lasagna.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926179/vegetarian_lasagna_pofugw.webp',
       },
       {
-        _id: 106,
         name: 'Beef Stir Fry',
         price: 14.99,
         description: 'Savory beef stir fry',
-        imageUrl: '/Images/products/beef_stir_fry.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926165/beef_stir_fry_pnz4je.webp',
       },
     ],
   },
@@ -97,46 +99,47 @@ const products = [
     category: 'Breads',
     items: [
       {
-        _id: 201,
         name: 'Crusty Baguette',
         price: 3.99,
         description: 'Freshly baked crusty baguette',
-        imageUrl: '/Images/products/baguette.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926165/baguette_pdlty4.webp',
       },
       {
-        _id: 202,
         name: 'Sourdough Loaf',
         price: 5.99,
         description: 'Tangy sourdough loaf',
-        imageUrl: '/Images/products/sourdough.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/sourdough_srsiet.webp',
+        isFeatured: true,
       },
       {
-        _id: 203,
         name: 'Croissants',
         price: 4.99,
         description: 'Flaky and buttery croissants',
-        imageUrl: '/Images/products/croissants.webp',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/croissants_woqume.webp',
       },
       {
-        _id: 204,
         name: 'Whole Wheat Rolls',
         price: 4.49,
         description: 'Healthy whole wheat rolls',
-        imageUrl: '/Images/products/wheat_rolls.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926179/wheat_rolls_fsajpw.webp',
       },
       {
-        _id: 205,
         name: 'Focaccia with Herbs',
         price: 5.99,
         description: 'Focaccia topped with herbs',
-        imageUrl: '/Images/products/focaccia.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/focaccia_odksjg.webp',
       },
       {
-        _id: 206,
         name: 'Pretzels',
         price: 3.49,
         description: 'Soft and salty pretzels',
-        imageUrl: '/Images/products/pretzel.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/pretzel_u5elde.webp',
       },
     ],
   },
@@ -144,46 +147,47 @@ const products = [
     category: 'Butters',
     items: [
       {
-        _id: 301,
         name: 'Peanut Butter',
         price: 3.99,
         description: 'Smooth and creamy peanut butter',
-        imageUrl: '/Images/products/peanut_butter.webp',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/peanut_butter_sea8lj.webp',
       },
       {
-        _id: 302,
         name: 'Whipped Honey Butter',
         price: 4.99,
         description: 'Honey butter whipped to perfection',
-        imageUrl: '/Images/products/honey_butter.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/honey_butter_gert6i.webp',
       },
       {
-        _id: 303,
         name: 'Garlic Herb Butter',
         price: 5.49,
         description: 'Butter infused with garlic and herbs',
-        imageUrl: '/Images/products/garlic_butter.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/garlic_butter_wbmkuy.webp',
+        isFeatured: true,
       },
       {
-        _id: 304,
         name: 'Almond Butter',
         price: 6.99,
         description: 'Nutty almond butter',
-        imageUrl: '/Images/products/almond_butter.webp',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926165/almond_butter_k9mltq.webp',
       },
       {
-        _id: 305,
         name: 'Chocolate Spread',
         price: 4.99,
         description: 'Rich chocolate spread',
-        imageUrl: '/Images/products/chocolate_spread.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/chocolate_spread_hmpohd.webp',
       },
       {
-        _id: 306,
         name: 'Cashew Butter',
         price: 7.49,
         description: 'Creamy cashew butter',
-        imageUrl: '/Images/products/cashew_butter.JPG',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926166/cashew_butter_t4zivg.webp',
       },
     ],
   },
@@ -191,49 +195,50 @@ const products = [
     category: 'Others',
     items: [
       {
-        _id: 401,
         name: 'Mixed Fruit Salad',
         price: 8.99,
         description: 'Freshly made fruit salad',
-        imageUrl: '/Images/products/fruit_salad.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926167/fruit_salad_yz25da.webp',
+        isFeatured: true,
       },
       {
-        _id: 402,
         name: 'Jar of Pickles',
         price: 4.99,
         description: 'Crunchy homemade pickles',
-        imageUrl: '/Images/products/pickles.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926178/pickles_qix58u.webp',
       },
       {
-        _id: 403,
         name: 'Cheese Platter',
         price: 14.99,
         description: 'Assorted cheeses on a platter',
-        imageUrl: '/Images/products/cheese_platter.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926166/cheese_platter_yqxjx7.webp',
       },
       {
-        _id: 404,
         name: 'Sushi Rolls',
         price: 12.99,
         description: 'Freshly prepared sushi rolls',
-        imageUrl: '/Images/products/sushi.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926179/sushi_qadtyy.webp',
+        isFeatured: true,
       },
       {
-        _id: 405,
         name: 'Boiled Peanuts',
         price: 5.99,
         description: 'Delicious boiled peanuts',
-        imageUrl: '/Images/products/boiled_peanuts.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926165/boiled_peanuts_dyh6cj.webp',
       },
       {
-        _id: 406,
         name: 'Bowl of Guacamole',
         price: 7.49,
         description: 'Creamy guacamole dip',
-        imageUrl: '/Images/products/guacamole.jpg',
+        imageUrl:
+          'https://res.cloudinary.com/dqrnaqgpy/image/upload/v1742926168/guacamole_vghp7e.webp',
       },
     ],
   },
 ];
-
-export default products;
+module.exports = products;

@@ -33,6 +33,7 @@ export const getCurrentUser = async (token) => {
     const response = await Api.getCurrentUser(token);
 
     if (response && response.user) {
+      console.log(response);
       return response.user;
     }
 

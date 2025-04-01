@@ -2,12 +2,14 @@ import { useState, useContext, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
+import { useOrders } from '../../context/OrdersContext';
 import './Dashboard.css';
 
-const Dashboard = ({ orders, fetchOrders }) => {
+const Dashboard = () => {
   const [isLeftSide, setIsLeftSide] = useState(false);
   const { currentUser } = useContext(AuthContext);
   const { cartItems, fetchCart } = useContext(CartContext);
+  const { orders, fetchOrders } = useOrders();
   useEffect(() => {
     fetchOrders();
     fetchCart();

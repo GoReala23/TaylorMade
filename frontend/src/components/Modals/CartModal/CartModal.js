@@ -35,7 +35,7 @@ const CartModal = ({ isOpen = true, onClose }) => {
       };
       fetchData();
     }
-  }, [isOpen]);
+  }, [isOpen, fetchCart, getSavedItems]);
 
   const handleBuyNow = async (product) => {
     if (!product) return;
@@ -71,6 +71,7 @@ const CartModal = ({ isOpen = true, onClose }) => {
     if (!cartItems || cartItems.length === 0) {
       return null;
     }
+
     const validItems = cartItems.filter((item) => {
       const { product } = item;
       return product && product.name && product.description && product.imageUrl;

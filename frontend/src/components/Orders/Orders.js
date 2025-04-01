@@ -1,14 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
 import { AuthContext } from '../../context/AuthContext';
+import { useOrders } from '../../context/OrdersContext';
 import Api from '../../utils/Api';
 import './Orders.css';
 import Card from '../Card/Card';
 
-const Orders = ({ orders, setOrders, fetchOrders }) => {
+const Orders = () => {
   const { isLoggedIn } = useContext(AuthContext);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('all');
-
+  const { orders, fetchOrders } = useOrders();
   useEffect(() => {
     fetchOrders().then(() => setLoading(false));
   }, []);

@@ -40,7 +40,6 @@
   top: -5px;
   right: -10px;
   background: none;
-
   border-radius: 100%;
   width: 36px;
   height: 36px;
@@ -51,9 +50,13 @@
   align-items: center;
   justify-content: center;
 }
+
 .preview__image-container {
   position: relative;
   width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .preview__image {
@@ -66,18 +69,20 @@
 
 .preview__icons {
   position: absolute;
-  top: 15px;
+  top: 10px;
+  left: 10px;
   right: 10px;
   display: flex;
-  gap: 10px;
-  display: flex;
   justify-content: space-between;
-  width: 480px;
+  align-items: center;
+  pointer-events: none;
+  z-index: 2;
 }
 
 .preview__heart-icon {
-  margin-left: auto;
+  /* margin-left: auto; */
 }
+
 .preview__heart-icon.liked {
   color: #8b4513;
 }
@@ -86,9 +91,15 @@
   color: white;
 }
 
+.preview__star-icon {
+  /* margin-right: 15vw; */
+}
+
 .preview__star-icon,
 .preview__heart-icon {
+  font-size: 1.5rem;
   cursor: pointer;
+  pointer-events: auto;
 }
 
 .preview__quantity-controls {
@@ -114,9 +125,7 @@
 
 /* Media Queries */
 
-/* Mobile View */
-
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 320px) and (max-width: 768px) {
   .preview__container {
     max-width: 60%;
     font-size: 0.8rem;
@@ -125,22 +134,29 @@
   .preview__image {
     max-height: 300px;
   }
-}
 
-/* Tablet/Laptop View */
+  .preview__icons {
+    top: 10px;
+    right: 5px;
+    width: auto;
+    padding: 5px;
+  }
+
+  @media screen and (max-width: 680px) {
+    .preview__star-icon,
+    .preview__heart-icon {
+      font-size: 1.2rem;
+    }
+  }
+}
 
 @media screen and (min-width: 769px) and (max-width: 1024px) {
   .preview__container {
     max-width: 80%;
-    /* font-size: 0.8rem; */
     height: 100%;
   }
 
   .preview__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     font-size: 0.5rem;
   }
 
@@ -151,23 +167,21 @@
   .preview__image {
     height: 85%;
   }
-}
 
-/* Desktop View/Larger */
+  .preview__icons {
+    top: 30px;
+    right: 5px;
+  }
+}
 
 @media screen and (min-width: 1025px) {
   .preview__container {
     max-width: 35%;
-
     height: 90%;
     font-size: 1.2rem;
   }
 
   .preview__content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     font-size: 0.8rem;
   }
 
@@ -178,11 +192,18 @@
   .preview__image-container {
     height: 60%;
   }
+
+  .preview__icons {
+    top: 30%;
+    right: 15px;
+    width: auto;
+  }
+
   .preview__star-icon {
     margin-left: 20%;
   }
 
   .preview__heart-icon {
-    margin-right: 15%;
+    margin-right: 20%;
   }
 }

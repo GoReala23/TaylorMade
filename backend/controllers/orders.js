@@ -88,49 +88,50 @@ const normalizeItem = (item) => {
 };
 
 // Create a new order
-const createOrder = async (req, res) => {
+const createOrder = async (req, res, next) => {
   try {
-    console.log('Create order request:', req.body);
     const { productId, quantity, address } = req.body;
-    const userId = req.user.userId;
+    const userId = req.user?.userId;
 
     if (!userId) {
-      return next(new UnauthorizedError('User not authenticated'));
+      return next(new UnauthorizedError('User not authenticated.'));
     }
 
-    if (!productId) {
-      return next(new BadRequestError('Product ID is required'));
+    if (!productId || !quantity || !address) {
+      return next(new BadRequestError('Missing required fields.'));
     }
 
     if (!mongoose.Types.ObjectId.isValid(productId)) {
-      return next(new BadRequestError('Invalid product ID format'));
+      return next(new BadRequestError('Invalid product ID format.'));
     }
 
-    // Check if the item exists using the Item model
-    const item = await Item.findById(productId);
+    const item = await Item.findOne({ productId });
+
     if (!item) {
-      return rnext(new NotFoundError('Item not found'));
+      console.log(' Item not found with productId:', productId);
+      const all = await Item.find({});
+
+      return next(new NotFoundError('Item not found.'));
     }
 
-    // Calculate the total price
     const total = item.price * quantity;
 
-    // Create the order with proper item reference
     const order = new Order({
       user: userId,
-      item: item, // Array of items as per schema
-      quantity: quantity,
-      total: total,
-      address: address,
+      item,
+      quantity,
+      total,
+      address,
       status: 'pending',
       imageUrl: item.imageUrl,
     });
 
     await order.save();
+
     res.status(201).json(order);
   } catch (err) {
-    console.error('Error creating order:', err.message);
-    next(new ServerError('An error occurred while creating the order'));
+    console.error(' Error creating order:', err.message);
+    next(new ServerError('Error creating order'));
   }
 };
 

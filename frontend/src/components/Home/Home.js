@@ -1,29 +1,23 @@
-import React, { useState, useEffect, useContext } from 'react';
+import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { ProductsContext } from '../../context/ProductsContext';
-import { useFeaturedProducts } from '../../context/FeaturedProductsContext';
+import { useBackupProducts } from '../../context/BackupProductContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
+import { useOrders } from '../../context/OrdersContext';
 import BuyModal from '../Modals/BuyModal/BuyModal';
 import PreviewOverlay from '../Modals/PreviewOverlay/PreviewOverlay';
-import Card, { formatProductData } from '../Card/Card';
+import Card from '../Card/Card';
 import './Home.css';
 
 const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useContext(AuthContext);
-  const { products, loading: productsLoading } = useContext(ProductsContext);
-  const { featuredProducts } = useFeaturedProducts();
+  const { products, isFeatured } = useBackupProducts();
   const { favorites, toggleFavorite } = useFavorites();
-  const {
-    cartItems,
-    addToCart,
-    fetchCart,
-    getSavedItems,
-    fetchOrders,
-    removeSavedItem,
-  } = useContext(CartContext);
+  const { cartItems, addToCart, fetchCart, getSavedItems } =
+    useContext(CartContext);
+  const { orders, fetchOrders, createOrder } = useOrders();
 
   const [modalStates, setModalStates] = useState({
     showPreview: false,
@@ -32,31 +26,28 @@ const Home = () => {
     productToBuy: null,
   });
   const [previewQuantity, setPreviewQuantity] = useState(1);
-  const [orders, setOrders] = useState([]);
 
   useEffect(() => {
     const initializeData = async () => {
+      const token = localStorage.getItem('token');
+      if (!isLoggedIn || !token) return;
+
       try {
-        if (isLoggedIn) {
-          await Promise.all([fetchOrders(), fetchCart(), getSavedItems()]);
-        }
+        await fetchCart();
+        setTimeout(() => getSavedItems(), 100);
+        setTimeout(() => fetchOrders(), 200);
       } catch (error) {
         console.error('Error initializing data:', error);
       }
     };
     initializeData();
-    console.log('Featured Products:', featuredProducts);
-    console.log('Products:', products);
-    console.log('Cart Items:', cartItems);
-    console.log('Favorites:', favorites);
-    console.log('Orders:', orders);
-  }, [isLoggedIn, fetchOrders, fetchCart, getSavedItems]);
+  }, [isLoggedIn]);
 
   const handleShowPreview = (product) => {
     setModalStates((prev) => ({
       ...prev,
       showPreview: true,
-      previewProduct: formatProductData(product),
+      previewProduct: product,
       showBuyModal: false,
       productToBuy: null,
     }));
@@ -66,33 +57,24 @@ const Home = () => {
     setModalStates((prev) => ({
       ...prev,
       showBuyModal: true,
-      productToBuy: formatProductData(product),
+      productToBuy: product,
       showPreview: false,
       previewProduct: null,
     }));
   };
 
-  const handleAddToCart = (product) => {
-    addToCart(product, 1);
-  };
+  const handleAddToCart = async (product) => {
+    const response = await addToCart({
+      productId: product.productId || product._id,
+      quantity: 1,
+    });
 
-  const handlePurchase = async () => {
-    try {
-      if (!modalStates.productToBuy || !modalStates.productToBuy._id) {
-        throw new Error('Invalid product data');
-      }
-      setModalStates((prev) => ({
-        ...prev,
-        type: 'buy',
-        showBuyModal: true,
-        productToBuy: modalStates.productToBuy,
-      }));
-    } catch (error) {
-      console.error('Error processing purchase:', error);
-      alert('Failed to process purchase. Please try again.');
+    if (response.success) {
+      console.log(' Item added to cart:', response);
+    } else {
+      console.error(' Error adding to cart:', response.message);
     }
   };
-
   const closeModal = () => {
     setModalStates({
       showPreview: false,
@@ -110,42 +92,91 @@ const Home = () => {
     }
   };
 
-  const renderProductGrid = (productList, title, limit = 4) => {
-    if (!productList || productList.length === 0) return null;
+  const handlePurchase = async (product, quantity, address) => {
+    try {
+      await createOrder(product._id, quantity, address);
 
-    return (
-      <section className='home__section'>
-        <h1 className='home__title'>{title}</h1>
-        <div className='home__grid'>
-          {productList.slice(0, limit).map((product) => {
-            const isFeatured = featuredProducts.some(
-              (featuredProduct) => featuredProduct._id === product._id,
-            );
+      setModalStates((prev) => ({
+        ...prev,
+        showBuyModal: false,
+      }));
+    } catch (error) {
+      console.error('Error placing order:', error);
+    }
+  };
 
-            return (
+  const renderProductGrid = useCallback(
+    (productList, title, limit = 4) => {
+      if (!productList) {
+        console.warn(
+          `Invalid productList for ${title}: productList is null or undefined`,
+        );
+        return null;
+      }
+      if (!Array.isArray(productList)) {
+        console.warn(
+          `Invalid productList for ${title}: not an array`,
+          productList,
+        );
+        return null;
+      }
+      if (productList.length === 0) {
+        return null;
+      }
+
+      const validProducts = productList.filter((product) => {
+        if (!product || typeof product !== 'object') {
+          console.warn(`Invalid product in ${title}:`, product);
+          return false;
+        }
+        if (
+          !product.name ||
+          typeof product.name !== 'string' ||
+          product.name.trim().length === 0
+        ) {
+          console.warn('Invalid product name:', product);
+          return false;
+        }
+        return true;
+      });
+
+      return (
+        <section className='home__section'>
+          <h1 className='home__title'>{title}</h1>
+          <div className='home__grid'>
+            {validProducts.slice(0, limit).map((product) => (
               <Card
-                key={product._id || `${product.name}-${product.price}`}
+                key={product._id}
                 product={product}
-                isFeatured={isFeatured}
+                isFeatured={product.isFeatured}
                 onAddToCart={() => handleAddToCart(product)}
                 onBuyNow={() => handleShowBuyModal(product)}
                 onFavorite={toggleFavorite}
                 onClick={() => handleShowPreview(product)}
               />
-            );
-          })}
-        </div>
-        <button
-          className='home__view-more'
-          onClick={() => handleViewMore(title)}
-        >
-          View More
-        </button>
-      </section>
-    );
-  };
-
+            ))}
+          </div>
+          <button
+            className='home__view-more'
+            onClick={() => handleViewMore(title)}
+          >
+            View More
+          </button>
+        </section>
+      );
+    },
+    [
+      handleAddToCart,
+      handleShowBuyModal,
+      handleShowPreview,
+      toggleFavorite,
+      handleViewMore,
+    ],
+  );
   const renderFeaturedSection = () => {
+    const featuredProducts = products.filter(
+      (product) => product.isFeatured === true,
+    );
     return renderProductGrid(featuredProducts, 'Featured Items');
   };
 
@@ -164,10 +195,18 @@ const Home = () => {
         <div className='home__grid'>
           {orders.slice(0, 4).map((order) => {
             const product = order.item[0];
+            if (!product) {
+              console.warn('Order is missing product details:', order);
+              return null;
+            }
+
             return (
               <Card
-                key={order._id || `${product.name}-${order.price}`}
-                product={{ ...product, price: product.price || order.price }}
+                key={
+                  order?._id ||
+                  `${product?.name || 'unknown'}-${order?.price || '0'}`
+                }
+                product={product}
                 isFeatured={product.isFeatured}
                 onAddToCart={() => handleAddToCart(product)}
                 onBuyNow={() => handleShowBuyModal(product)}
@@ -196,20 +235,25 @@ const Home = () => {
       <section className='home__section'>
         <h1 className='home__title'>My Cart</h1>
         <div className='home__grid'>
-          {cartItems.map((item) => (
-            <Card
-              isFeatured={item.product.isFeatured}
-              key={
-                item.product?._id || `${item.product?.name}-${item.quantity}`
-              }
-              product={item.product || item.name}
-              onAddToCart={() => handleAddToCart(item.product)}
-              onBuyNow={() => handleShowBuyModal(item.product)}
-              onFavorite={toggleFavorite}
-              onClick={() => handleShowPreview(item.product)}
-              initialQuantity={item.quantity}
-            />
-          ))}
+          {cartItems.map((item) => {
+            if (!item || !item.product) {
+              console.warn('Cart item is missing product details:', item);
+              return null;
+            }
+
+            return (
+              <Card
+                isFeatured={item.isFeatured || isFeatured || false}
+                key={item._id}
+                product={item.product}
+                onAddToCart={() => handleAddToCart(item.product)}
+                onBuyNow={() => handleShowBuyModal(item.product)}
+                onFavorite={toggleFavorite}
+                onClick={() => handleShowPreview(item.product)}
+                initialQuantity={item.quantity}
+              />
+            );
+          })}
         </div>
         <button
           className='home__view-more'
@@ -233,6 +277,7 @@ const Home = () => {
         isLiked={favorites.some(
           (fav) => fav._id === modalStates.previewProduct?._id,
         )}
+        isFeatured={modalStates.previewProduct?.isFeatured || false}
         onQuantityChange={(newQuantity) => setPreviewQuantity(newQuantity)}
         onAddToCart={() => handleAddToCart(modalStates.previewProduct)}
         onBuyNow={() => handleShowBuyModal(modalStates.previewProduct)}
