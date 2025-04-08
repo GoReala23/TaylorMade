@@ -17,12 +17,12 @@ TaylorMade is a full-stack e-commerce application designed for browsing and purc
 
 ## Features
 
-✅ **User Authentication (Login/Register)**  
-✅ **Product Browsing and Filtering**  
-✅ **Shopping Cart Management**  
-✅ **Order Processing**  
-✅ **Admin Dashboard**  
-✅ **Responsive Design**
+**User Authentication (Login/Register)**  
+ **Product Browsing and Filtering**  
+ **Shopping Cart Management**  
+ **Order Processing**  
+ **Admin Dashboard**  
+ **Responsive Design**
 
 ---
 
