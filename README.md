@@ -200,10 +200,6 @@ npm install
 Frontend
 npm start
 
-## Live Demo
-
-[View Live Demo](https://goreala23.github.io/TaylorMade)
-
 ## Contributing
 
 1. Fork repository
