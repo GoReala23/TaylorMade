@@ -1,4 +1,5 @@
-import React, { useCallback, useContext, useState } from 'react';
+import React, { useCallback, useContext, useEffect, useState } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import ModalWithForm from '../ModalWithForm/ModalWithForm';
 import { AuthContext } from '../../../context/AuthContext';
 import useFormAndValidation from '../../../hooks/useFormAndValidation';
@@ -8,18 +9,14 @@ const LoginModal = ({
   onClose,
   onLogin,
   onSwitchToRegister,
-  successMessage,
-  errorMessage,
+  message,
+  type,
 }) => {
-  const {
-    login,
-    authError,
-    successMessage: contextSuccessMessage,
-  } = useContext(AuthContext);
   const { values, handleChange, errors, isValid, resetForm } =
     useFormAndValidation();
-  const [localSuccessMessage, setLocalSuccessMessage] = useState('');
-  const [localErrorMessage, setLocalErrorMessage] = useState('');
+  const { login } = useContext(AuthContext);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   const handleSubmit = useCallback(
     async (e) => {
@@ -27,15 +24,19 @@ const LoginModal = ({
 
       try {
         await onLogin({ email: values.email, password: values.password });
-        setTimeout(() => {
-          onClose();
-          resetForm();
-        }, 3000);
+
+        if (
+          location.pathname !== '/home' &&
+          location.pathname !== '/products'
+        ) {
+          navigate('/');
+        }
+        resetForm();
       } catch (error) {
         console.error('Login Failed:', error);
       }
     },
-    [onLogin, values, resetForm, onClose],
+    [onLogin, values, resetForm, onClose, navigate, location.pathname],
   );
 
   return (
@@ -48,8 +49,8 @@ const LoginModal = ({
       isSubmitDisabled={!isValid}
       formTabSwitch={onSwitchToRegister}
       switchText='Need to register?'
-      successMessage={successMessage}
-      errorMessage={authError || errorMessage}
+      successMessage={type === 'success' ? message : null}
+      errorMessage={type === 'error' ? message : null}
     >
       <label className='modal__form-label'>
         Email

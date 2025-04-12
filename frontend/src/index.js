@@ -11,28 +11,31 @@ import reportWebVitals from './reportWebVitals';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { CartProvider } from './context/CartContext';
 import { OrdersProvider } from './context/OrdersContext';
+import { ErrorProvider } from './context/ErrorsContext';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
     <HashRouter>
-      <AuthProvider>
-        <ProductsProvider>
-          {' '}
-          <FeaturedProductsProvider>
-            <BackupProductProvider>
-              {' '}
-              <FavoritesProvider>
-                <CartProvider>
-                  <OrdersProvider>
-                    <App />
-                  </OrdersProvider>
-                </CartProvider>
-              </FavoritesProvider>
-            </BackupProductProvider>
-          </FeaturedProductsProvider>
-        </ProductsProvider>
-      </AuthProvider>
+      <ErrorProvider>
+        <AuthProvider>
+          <ProductsProvider>
+            {' '}
+            <FeaturedProductsProvider>
+              <BackupProductProvider>
+                {' '}
+                <FavoritesProvider>
+                  <CartProvider>
+                    <OrdersProvider>
+                      <App />
+                    </OrdersProvider>
+                  </CartProvider>
+                </FavoritesProvider>
+              </BackupProductProvider>
+            </FeaturedProductsProvider>
+          </ProductsProvider>
+        </AuthProvider>
+      </ErrorProvider>
     </HashRouter>
   </React.StrictMode>,
 );

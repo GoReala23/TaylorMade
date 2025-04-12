@@ -1,7 +1,8 @@
 import { createContext, useState, useEffect, useContext } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import * as Auth from '../utils/Auth';
 import CurrentUserContext from './CurrentUserContext';
+import { useError } from './ErrorsContext';
 
 export const AuthContext = createContext(null);
 
@@ -17,9 +18,10 @@ export const AuthProvider = ({ children }) => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [authError, setAuthError] = useState(null);
-  const [successMessage, setSuccessMessage] = useState(null);
+  const { triggerError, triggerSuccess, successMessage, errorMessage } =
+    useError();
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const initializeAuthState = async () => {
@@ -43,10 +45,7 @@ export const AuthProvider = ({ children }) => {
     };
     initializeAuthState();
   }, []);
-  const clearMessages = () => {
-    setAuthError(null);
-    setSuccessMessage(null);
-  };
+
   const register = async (userData) => {
     try {
       const response = await Auth.register(
@@ -54,37 +53,39 @@ export const AuthProvider = ({ children }) => {
         userData.email,
         userData.password,
       );
-      setSuccessMessage('Registration successful! Please log in.');
-      setAuthError(null);
-      setTimeout(clearMessages, 3000);
+      triggerSuccess('Registration successful! 🎉');
+
       return response;
     } catch (error) {
-      console.error('Registration error:', error);
-      setAuthError(error.message || 'Registration failed. Please try again.');
-      setSuccessMessage(null);
-      setTimeout(clearMessages, 3000);
-      throw error;
+      const msg =
+        error.response?.data?.message ||
+        error.message ||
+        'Registration failed.';
+
+      triggerError(msg);
     }
+    return null;
   };
+
   const login = async (userData) => {
     try {
-      setAuthError(null);
-      setSuccessMessage(null);
-
       const response = await Auth.login(userData.email, userData.password);
+
       localStorage.setItem('token', response.token);
-      localStorage.setItem('isLoggedIn', true);
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('user', JSON.stringify(response.user));
+
       setCurrentUser(response.user);
       setIsLoggedIn(true);
-
-      setSuccessMessage('Login successful!');
-      setTimeout(() => setSuccessMessage(null), 3000);
+      triggerSuccess('Login successful! 🎉');
+      if (location.pathname === '/' || location.pathname === '/login') {
+        navigate('/home');
+      }
     } catch (error) {
-      setAuthError(
-        error.message && 'Login failed. Please check your credentials.',
-      );
-      setSuccessMessage(null);
-      setTimeout(() => setAuthError(null), 3000);
+      const msg =
+        error.response?.data?.message || error.message || 'Login failed.';
+      console.error('[AuthContext] Login error:', msg);
+      triggerError(msg);
     }
   };
 
@@ -97,13 +98,9 @@ export const AuthProvider = ({ children }) => {
     navigate('/');
   };
 
-  const isAdmin = () => {
-    return currentUser?.isAdmin === true;
-  };
+  const isAdmin = () => currentUser?.isAdmin === true;
 
-  if (isLoading) {
-    return null;
-  }
+  if (isLoading) return null;
 
   return (
     <AuthContext.Provider
@@ -114,8 +111,8 @@ export const AuthProvider = ({ children }) => {
         login,
         logout,
         isAdmin,
-        authError,
         successMessage,
+        errorMessage,
       }}
     >
       <CurrentUserContext.Provider value={currentUser}>

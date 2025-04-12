@@ -12,6 +12,7 @@
   font-size: 1rem;
   font-family: 'Roboto', sans-serif;
   z-index: 1000;
+  overflow-x: visible;
 }
 
 /* Modifiers */
@@ -167,8 +168,6 @@
   }
 
   .header__logo-image {
-    /* width: 4rem;
-    height: 4rem; */
   }
 
   .header--landing {

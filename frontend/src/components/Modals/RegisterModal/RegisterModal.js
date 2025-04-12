@@ -3,9 +3,15 @@ import ModalWithForm from '../ModalWithForm/ModalWithForm';
 import useFormAndValidation from '../../../hooks/useFormAndValidation';
 import { AuthContext } from '../../../context/AuthContext';
 
-const RegisterModal = ({ isOpen, onClose, onRegister, onSwitchToLogin }) => {
-  const { register, authError, successMessage, errorMessage } =
-    useContext(AuthContext);
+const RegisterModal = ({
+  isOpen,
+  onClose,
+  onRegister,
+  onSwitchToLogin,
+  message,
+  type,
+}) => {
+  const { register } = useContext(AuthContext);
   const { values, handleChange, errors, isValid, resetForm } =
     useFormAndValidation();
 
@@ -18,6 +24,7 @@ const RegisterModal = ({ isOpen, onClose, onRegister, onSwitchToLogin }) => {
       console.error('Registration Failed:', error);
     }
   };
+
   return (
     <ModalWithForm
       isOpen={isOpen}
@@ -28,8 +35,8 @@ const RegisterModal = ({ isOpen, onClose, onRegister, onSwitchToLogin }) => {
       isSubmitDisabled={!isValid}
       formTabSwitch={onSwitchToLogin}
       switchText='Already have an account?'
-      successMessage={successMessage}
-      errorMessage={errorMessage || authError}
+      message={message}
+      type={type}
     >
       <label className='modal__form-label'>
         Name

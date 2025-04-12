@@ -1,65 +1,61 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import { AuthContext } from '../../../context/AuthContext';
+import { useError } from '../../../context/ErrorsContext';
 import Modal from '../Modal/Modal';
 import LoginModal from '../LoginModal/LoginModal';
 import RegisterModal from '../RegisterModal/RegisterModal';
 import './AuthModal.css';
 
-const AuthModal = ({ isOpen, onClose, onLogin, onRegister, initialTab }) => {
+const AuthModal = ({ isOpen, onClose, initialTab }) => {
   const [activeTab, setActiveTab] = useState(initialTab || 'login');
-  const [successMessage, setSuccessMessage] = useState('');
-  const [errorMessage, setErrorMessage] = useState('');
+
+  const { login, register, successMessage, errorMessage } =
+    useContext(AuthContext);
 
   useEffect(() => {
     setActiveTab(initialTab || 'login');
   }, [initialTab, isOpen]);
 
-  const handleRegister = async (userData) => {
-    try {
-      await onRegister(userData);
-      setSuccessMessage('Registration successful! 🎉'); //  Define successMessage
-      setErrorMessage('');
-
-      setTimeout(() => {
-        setSuccessMessage('');
-        setActiveTab('login'); //  Switch to login after 3 sec
-      }, 3000);
-    } catch (error) {
-      const errorMsg =
-        error.message || 'Registration failed. Please try again.';
-      setErrorMessage(errorMsg);
-      setSuccessMessage('');
-      console.log('[AuthModal] Error message set:', errorMsg);
-
-      setTimeout(() => {
-        setErrorMessage('');
-      }, 3000);
-    }
+  const handleLogin = async (userData) => {
+    await login(userData);
   };
 
-  const handleLogin = async (userData) => {
-    try {
-      await onLogin(userData);
-      setSuccessMessage('Login successful! ');
-      setErrorMessage('');
-
-      setTimeout(() => {
-        setSuccessMessage('');
-        onClose(); //  Close modal after success
+  useEffect(() => {
+    if (successMessage && activeTab === 'login') {
+      const timer = setTimeout(() => {
+        onClose();
       }, 3000);
-    } catch (error) {
-      const errorMsg = error.message;
-      console.log(errorMsg);
-      setErrorMessage(errorMsg);
-      setSuccessMessage('');
-      console.log('[AuthModal] Error message set:', errorMsg);
-
-      setTimeout(() => {
-        setErrorMessage('');
-      }, 10000);
+      return () => clearTimeout(timer);
     }
+    return undefined;
+  }, [successMessage, activeTab, onClose]);
+
+  useEffect(() => {
+    if (
+      isOpen &&
+      activeTab === 'register' &&
+      successMessage === 'Registration successful! 🎉'
+    ) {
+      const timer = setTimeout(() => {
+        setActiveTab('login');
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [isOpen, activeTab, successMessage]);
+
+  const handleRegister = async (userData) => {
+    await register(userData);
   };
 
   if (!isOpen) return null;
+
+  let messageType = '';
+  if (successMessage) {
+    messageType = 'success';
+  } else if (errorMessage) {
+    messageType = 'error';
+  }
 
   return (
     <Modal isOpen={isOpen} onClose={onClose}>
@@ -78,14 +74,15 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister, initialTab }) => {
             Register
           </button>
         </div>
+
         {activeTab === 'login' ? (
           <LoginModal
             isOpen={true}
             onClose={onClose}
             onLogin={handleLogin}
             onSwitchToRegister={() => setActiveTab('register')}
-            successMessage={successMessage} //  Pass successMessage
-            errorMessage={errorMessage} // Pass errorMessage
+            message={errorMessage || successMessage}
+            type={messageType}
           />
         ) : (
           <RegisterModal
@@ -93,8 +90,8 @@ const AuthModal = ({ isOpen, onClose, onLogin, onRegister, initialTab }) => {
             onClose={onClose}
             onRegister={handleRegister}
             onSwitchToLogin={() => setActiveTab('login')}
-            successMessage={successMessage} //  Pass successMessage
-            errorMessage={errorMessage} //  Pass errorMessage
+            message={errorMessage || successMessage}
+            type={messageType}
           />
         )}
       </div>

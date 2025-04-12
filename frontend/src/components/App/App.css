@@ -1,15 +1,14 @@
 .App {
   display: flex;
   flex-direction: column;
-  /* overflow: hidden; */
+
   align-items: center;
   text-align: center;
-  /* flex-wrap: wrap; */
-  /* justify-content: space-between; */
+
   position: relative;
   min-height: 100vh;
   width: 100%;
-  /* height: 100vh; */
+
   background: none;
   color: #8b4513;
 }
@@ -31,21 +30,20 @@
 
 /* When dashboard is present */
 .App--with-dashboard .App__content {
-  padding-top: calc(65px + 10vh); /* Dashboard height + Header height */
+  padding-top: calc(65px + 10vh);
 }
 
 @media only screen and (max-width: 680px) {
   .App {
     .App {
       height: 120vh;
-      /* max-width: 705px; */
+
       min-width: 320px;
       width: 100%;
       align-items: baseline;
       margin: 0;
       display: flex;
       flex-wrap: wrap;
-      /* align-content: stretch; */
     }
   }
 }

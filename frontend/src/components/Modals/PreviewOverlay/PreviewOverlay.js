@@ -108,7 +108,7 @@ const PreviewOverlay = ({
               <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
-                onLogin={() => navigate('/login')}
+                // onLogin={() => navigate('/login')}
                 onRegister={() => navigate('/register')}
               />
             )}

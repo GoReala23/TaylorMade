@@ -143,6 +143,16 @@ const App = ({ token }) => {
             element={!isLoggedIn ? <LandingPage /> : <Navigate to='/home' />}
           />
           <Route
+            path='/login'
+            element={
+              !isLoggedIn ? (
+                <LandingPage initialTab='login' />
+              ) : (
+                <Navigate to='/home' />
+              )
+            }
+          />
+          <Route
             path='/dashboard'
             element={
               isLoggedIn ? (
