@@ -57,6 +57,7 @@
   .footer {
     height: 10vh;
     max-width: 100%;
+    padding: 1%;
   }
 
   .footer__text {

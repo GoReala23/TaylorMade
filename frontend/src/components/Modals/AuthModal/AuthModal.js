@@ -38,7 +38,7 @@ const AuthModal = ({ isOpen, onClose, initialTab }) => {
     ) {
       const timer = setTimeout(() => {
         setActiveTab('login');
-      }, 3000);
+      }, 5000);
       return () => clearTimeout(timer);
     }
     return undefined;
