@@ -1,11 +1,11 @@
 .footer {
   background: rgba(246, 224, 158, 0.95);
-  /* padding: 20px 0; */
+
   border-top: 5px solid #8b4513;
   box-shadow: 0 -2px 4px rgba(0, 0, 0, 0.1);
   color: #8b4513;
   width: 100%;
-  /* height: 5vh; */
+
   margin-top: auto;
   display: flex;
   align-items: center;
@@ -14,10 +14,6 @@
   bottom: 0;
   left: 0;
   flex-shrink: 0;
-}
-
-.footer__container {
-  /* padding-left: 20px; */
 }
 
 .footer__text {
@@ -33,7 +29,7 @@
 @media screen and (min-width: 767px) {
   .footer {
     height: 10vh;
-    /* max-width: 680px; */
+
     padding: 0;
     position: relative;
   }

@@ -45,9 +45,8 @@ export const OrdersProvider = ({ children }) => {
 
       // Update state
       setOrders((prevOrders) => {
-        const updatedOrders = [...prevOrders, newOrder];
-
-        return updatedOrders;
+        const currentOrders = Array.isArray(prevOrders) ? prevOrders : [];
+        return [...currentOrders, newOrder];
       });
 
       return newOrder;

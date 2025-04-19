@@ -18,19 +18,16 @@ export const ProductsProvider = ({ children }) => {
 
   useEffect(() => {
     const normalizeProduct = (product, category = 'Others') => {
-      // Validate required fields
       if (!product || typeof product !== 'object') {
         return null;
       }
 
-      // Ensure the product has a valid ID
       const productId = product.productId || product._id || product.id;
       if (!productId) {
         console.warn('Skipping product without a valid ID:', product);
         return null;
       }
 
-      // Normalize and validate required fields
       const name = product.name || product.title || 'Unnamed Product';
       const price =
         typeof product.price === 'number'
@@ -40,7 +37,6 @@ export const ProductsProvider = ({ children }) => {
       const imageUrl =
         product.imageUrl || product.image || '/images/products/default.jpg';
 
-      // Return normalized product structure
       return {
         productId,
         name: name.trim(),

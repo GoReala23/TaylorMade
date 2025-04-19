@@ -100,6 +100,7 @@ const Home = () => {
         ...prev,
         showBuyModal: false,
       }));
+      await fetchOrders();
     } catch (error) {
       console.error('Error placing order:', error);
     }

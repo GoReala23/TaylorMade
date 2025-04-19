@@ -33,6 +33,9 @@ const Products = ({ modalStates = {}, setModalStates }) => {
         uniqueCategories.add(product.category);
       }
     });
+    if (favorites.length > 0) {
+      uniqueCategories.add('Favorites');
+    }
     return Array.from(uniqueCategories);
   }, [products]);
 
@@ -86,6 +89,10 @@ const Products = ({ modalStates = {}, setModalStates }) => {
     const filterCategory = (product) => {
       if (selectedCategory === 'All') {
         return true;
+      }
+
+      if (selectedCategory === 'Favorites') {
+        return favorites.some((fav) => fav._id === product._id);
       }
       return (
         product.categories?.includes(selectedCategory) ||
