@@ -174,6 +174,10 @@ The **backend** of TaylorMade is built with **Node.js & Express** and provides A
 - **PUT** `/api/cart/:id`
 - **DELETE** `/api/cart/:id`
 
+## Video Presentation
+
+![Live Presentation](https://www.tella.tv/video/cm9nrim2o000r0bl75i0e4f54/view)
+
 ---
 
 ## Installation
