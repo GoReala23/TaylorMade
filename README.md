@@ -176,7 +176,7 @@ The **backend** of TaylorMade is built with **Node.js & Express** and provides A
 
 ## Video Presentation
 
-![Live Presentation](https://www.tella.tv/video/cm9nrim2o000r0bl75i0e4f54/view)
+[Live Presentation](https://www.tella.tv/video/cm9nrim2o000r0bl75i0e4f54/view)
 
 ---
 
