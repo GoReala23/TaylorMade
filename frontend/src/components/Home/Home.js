@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../../context/AuthContext';
-import { useBackupProducts } from '../../context/BackupProductContext';
+import { useProducts } from '../../context/ProductsContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import { useOrders } from '../../context/OrdersContext';
@@ -13,7 +13,7 @@ import './Home.css';
 const Home = () => {
   const navigate = useNavigate();
   const { isLoggedIn } = useContext(AuthContext);
-  const { products, isFeatured } = useBackupProducts();
+  const { products, isFeatured } = useProducts();
   const { favorites, toggleFavorite } = useFavorites();
   const { cartItems, addToCart, fetchCart, getSavedItems } =
     useContext(CartContext);
@@ -145,9 +145,9 @@ const Home = () => {
         <section className='home__section'>
           <h1 className='home__title'>{title}</h1>
           <div className='home__grid'>
-            {validProducts.slice(0, limit).map((product) => (
+            {validProducts.slice(0, limit).map((product, idx) => (
               <Card
-                key={product._id}
+                key={product._id || product.name + idx}
                 product={product}
                 isFeatured={product.isFeatured}
                 onAddToCart={() => handleAddToCart(product)}

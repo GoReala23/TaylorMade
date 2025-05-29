@@ -225,10 +225,10 @@
     flex-direction: column;
     position: absolute;
     top: 100%;
-    left: 70%;
-    width: 30%;
+    left: 84%;
+    width: auto;
     max-width: 100%;
-    background: rgba(246, 224, 158, 0.95);
+    background: none;
     text-align: center;
     padding: 0.2rem;
     border-radius: 0.5rem;
@@ -247,6 +247,7 @@
     font-size: 0.85rem;
     border-radius: 0.3rem;
     margin: 0.2rem auto;
+    background: rgba(246, 224, 158, 0.95);
   }
 
   .header--landing {

@@ -1,7 +1,7 @@
 import React, { useContext, useState, memo, useMemo } from 'react';
 import { FaHeart, FaStar, FaPlus, FaMinus } from 'react-icons/fa';
 import PropTypes from 'prop-types';
-import { useBackupProducts } from '../../context/BackupProductContext';
+import { useProducts } from '../../context/ProductsContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { CartContext } from '../../context/CartContext';
 import './Card.css';
@@ -59,7 +59,7 @@ const Card = ({
   ...props
 }) => {
   const { favorites } = useFavorites();
-  const { products } = useBackupProducts();
+  const { products } = useProducts();
   const [quantity, setQuantity] = useState(initialQuantity);
   const [localQuantity, setLocalQuantity] = useState(initialQuantity);
   const { handleQuantityChange } = useContext(CartContext);

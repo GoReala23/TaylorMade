@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo } from 'react';
 import { useProducts } from './ProductsContext';
 import { useFeaturedProducts } from './FeaturedProductsContext';
-import backupData from '../utils/products';
+// import backupData from '../utils/products';
 
 export const BackupProductContext = createContext();
 

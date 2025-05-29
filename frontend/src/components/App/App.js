@@ -25,6 +25,8 @@ import '../../fonts/fonts.css';
 const App = ({ token }) => {
   const { isLoggedIn, currentUser } = useContext(AuthContext);
   const { cartItems, fetchCart } = useContext(CartContext);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [initialAuthTab, setInitialAuthTab] = useState('login');
   const [items, setItems] = useState([]);
   const [cart, setCart] = useState([]);
   const [orders, setOrders] = useState([]);

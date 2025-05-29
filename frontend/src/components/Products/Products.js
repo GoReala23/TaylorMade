@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
-import { useBackupProducts } from '../../context/BackupProductContext';
+import { useProducts } from '../../context/ProductsContext';
 import { AuthContext } from '../../context/AuthContext';
 import { CartContext } from '../../context/CartContext';
 import { useOrders } from '../../context/OrdersContext';
@@ -12,7 +12,7 @@ import Card from '../Card/Card';
 import './Products.css';
 
 const Products = ({ modalStates = {}, setModalStates }) => {
-  const { products, loading } = useBackupProducts();
+  const { products, loading } = useProducts();
   const { favorites, addFavorite, removeFavorite } = useFavorites();
   const { createOrder } = useOrders();
   const { isLoggedIn } = useContext(AuthContext);

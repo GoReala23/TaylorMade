@@ -30,8 +30,8 @@
 }
 
 .card__quantity-input {
-  width: 100%;
-  min-width: 45%;
+  width: 50px;
+  min-width: none;
   max-width: 90%;
   text-overflow: ellipsis;
   text-align: center;
@@ -84,11 +84,6 @@
   .card__info {
     font-size: 0.8rem;
   }
-
-  /* .card__image {
-    height: 65%;
-    width: 75%;
-  } */
 
   .card__favorite-btn {
     top: 0vh;
